@@ -114,6 +114,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Images\ColorChart.xlsx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -130,12 +131,27 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\WIN_20230204_10_18_08_Pro.jpg" />
-    <Resource Include="Images\WIN_20230204_10_45_36_Pro.jpg" />
-    <Resource Include="Images\WIN_20230204_13_15_31_Pro.bmp" />
-    <Resource Include="Images\WIN_20230204_13_15_31_Pro.jpg" />
-    <Resource Include="Images\WIN_20230204_13_15_35_Pro.jpg" />
-    <Resource Include="Images\WIN_20230204_13_15_39_Pro.jpg" />
+    <None Include="Images\WIN_20230204_10_18_08_Pro.jpg" />
+    <None Include="Images\WIN_20230204_10_45_36_Pro.jpg" />
+    <None Include="Images\WIN_20230204_13_15_31_Pro.bmp" />
+    <None Include="Images\WIN_20230204_13_15_31_Pro.jpg" />
+    <None Include="Images\WIN_20230204_13_15_35_Pro.jpg" />
+    <None Include="Images\WIN_20230204_13_15_39_Pro.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\WIN_20230204_10_18_09_Pro.jpg" />
+    <None Include="Images\無題.png" />
+    <None Include="Images\無題10.png" />
+    <None Include="Images\無題11.png" />
+    <None Include="Images\無題12.png" />
+    <None Include="Images\無題13.png" />
+    <None Include="Images\無題14.png" />
+    <None Include="Images\無題2.png" />
+    <None Include="Images\無題3.png" />
+    <None Include="Images\無題4.png" />
+    <None Include="Images\無題5.png" />
+    <None Include="Images\無題6.png" />
+    <None Include="Images\無題7.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
