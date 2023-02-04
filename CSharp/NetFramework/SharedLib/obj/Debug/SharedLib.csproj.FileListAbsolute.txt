@@ -1,0 +1,13 @@
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\bin\Debug\SharedLib.dll
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\bin\Debug\SharedLib.pdb
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib.csproj.AssemblyReference.cache
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib_MarkupCompile.cache
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib_MarkupCompile.lref
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\Themes\Generic.baml
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib.g.resources
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib.Properties.Resources.resources
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib.csproj.GenerateResource.cache
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib.csproj.CoreCompileInputs.cache
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib.dll
+C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\SharedLib\obj\Debug\SharedLib.pdb
