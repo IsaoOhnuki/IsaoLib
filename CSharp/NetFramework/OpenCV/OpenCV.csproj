@@ -129,6 +129,14 @@
       <Name>MVVM</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\WIN_20230204_10_18_08_Pro.jpg" />
+    <Resource Include="Images\WIN_20230204_10_45_36_Pro.jpg" />
+    <Resource Include="Images\WIN_20230204_13_15_31_Pro.bmp" />
+    <Resource Include="Images\WIN_20230204_13_15_31_Pro.jpg" />
+    <Resource Include="Images\WIN_20230204_13_15_35_Pro.jpg" />
+    <Resource Include="Images\WIN_20230204_13_15_39_Pro.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
