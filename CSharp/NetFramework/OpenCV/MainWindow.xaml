@@ -20,10 +20,16 @@
                     Command="{Binding OpenSource}"/>
             <Button Content="Target"
                     Command="{Binding OpenTarget}"/>
-            <Button Content="Search"
-                    Command="{Binding Search}"/>
+            <Separator/>
+            <ComboBox IsEditable="False"
+                      IsReadOnly="True"
+                      Width="100"
+                      ItemsSource="{Binding TemplateMatchModeList}"
+                      SelectedItem="{Binding SelectedTemplateMatchMode}"/>
             <TextBox Text="{Binding Threshold}"
                      Width="50"/>
+            <Button Content="Search"
+                    Command="{Binding Search}"/>
         </ToolBar>
         <Grid Grid.Row="1">
             <Grid.Resources>
@@ -37,26 +43,28 @@
             <GridSplitter Grid.Column="1"
                           HorizontalAlignment="Stretch"
                           Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}"/>
-            <ScrollViewer Grid.Column="0">
+            <ScrollViewer Grid.Column="0"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                 <Image Source="{Binding SourceImage}"
                        HorizontalAlignment="Left"
-                       VerticalAlignment="Top"/>
+                       VerticalAlignment="Top"
+                       Stretch="None"/>
             </ScrollViewer>
             <ScrollViewer Grid.Column="2"
-                          HorizontalScrollBarVisibility="Auto">
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                 <Grid>
                     <Image x:Name="image" Source="{Binding TargetImage}"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Top"
                            Stretch="None"/>
                     <Canvas Visibility="{Binding Result, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            Width="{Binding Width, ElementName=image}"
-                            Height="{Binding Height, ElementName=image}"
+                            Width="{Binding ActualWidth, ElementName=image}"
+                            Height="{Binding ActualHeight, ElementName=image}"
                             HorizontalAlignment="Left"
-                            VerticalAlignment="Top">
-                        <Canvas.Background>
-                            <SolidColorBrush Color="#7FFFFFFF" Opacity="1"/>
-                        </Canvas.Background>
+                            VerticalAlignment="Top"
+                            Background="#7FFFFFFF">
                         <Rectangle Canvas.Left="{Binding ResultRect.Left}"
                                    Canvas.Top="{Binding ResultRect.Top}"
                                    Width="{Binding ResultRect.Width}"

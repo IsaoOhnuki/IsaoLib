@@ -4,6 +4,7 @@ using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
@@ -27,11 +28,11 @@ namespace OpenCV
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        private ImageSearchViewModel imageSearchViewModel { get; } = new ImageSearchViewModel();
+        private ImageSearchViewModel ImageSearchViewModel { get; } = new ImageSearchViewModel();
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = imageSearchViewModel;
+            DataContext = ImageSearchViewModel;
         }
     }
 
@@ -69,7 +70,9 @@ namespace OpenCV
             });
             Search = new DefaultCommand(v =>
             {
-                if (CvTemplateMatching(TargetImage, SourceImage, Threshold, out System.Drawing.Rectangle match))
+                TemplateMatchModes matchMode =
+                    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                if (CvTemplateMatching(TargetImage, SourceImage, Threshold, matchMode, out System.Drawing.Rectangle match))
                 {
                     Result = true;
                     ResultRect = new System.Windows.Rect(match.X, match.Y, match.Width, match.Height);
@@ -79,6 +82,10 @@ namespace OpenCV
                     Result = false;
                 }
             });
+
+            Enum.GetNames(typeof(TemplateMatchModes)).ToList().
+                ForEach(name => TemplateMatchModeList.Add(name));
+            SelectedTemplateMatchMode = TemplateMatchModes.CCoeffNormed.ToString();
         }
 
         public DefaultCommand OpenSource { get; }
@@ -86,6 +93,15 @@ namespace OpenCV
         public DefaultCommand OpenTarget { get; }
 
         public DefaultCommand Search { get; }
+
+        public ObservableCollection<string> TemplateMatchModeList { get; } = new ObservableCollection<string>();
+
+        public string SelectedTemplateMatchMode
+        {
+            get => _selectedTemplateMatchMode;
+            set => SetProperty(ref _selectedTemplateMatchMode, value);
+        }
+        private string _selectedTemplateMatchMode;
 
         public BitmapImage SourceImage
         {
@@ -130,28 +146,41 @@ namespace OpenCV
         /// <param name="threshold"></param>
         /// <param name="res_rectangle"></param>
         /// <returns></returns>
-        public static bool CvTemplateMatching(Mat target_image, Mat rect_image, double threshold, out System.Drawing.Rectangle res_rectangle)
+        public static bool CvTemplateMatching(Mat target_image, Mat rect_image, double threshold, TemplateMatchModes matchMode, out System.Drawing.Rectangle res_rectangle)
         {
             res_rectangle = new System.Drawing.Rectangle();
 
             using (Mat result = new Mat())
             {
                 //画像認識
-                Cv2.MatchTemplate(target_image, rect_image, result, TemplateMatchModes.CCoeffNormed);
+                Cv2.MatchTemplate(target_image, rect_image, result, matchMode);
 
                 // 類似度が最大/最小となる画素の位置を調べる
-                OpenCvSharp.Point minloc, maxloc;
-                double minval, maxval;
-                Cv2.MinMaxLoc(result, out minval, out maxval, out minloc, out maxloc);
+                Cv2.MinMaxLoc(result, out double minval, out double maxval, out OpenCvSharp.Point minloc, out OpenCvSharp.Point maxloc);
 
                 // しきい値で判断
                 if (maxval >= threshold)
                 {
                     //閾値を超えたものを取得
-                    res_rectangle.X = maxloc.X;
-                    res_rectangle.Y = maxloc.Y;
+
+                    OpenCvSharp.Point topLeft;
+                    if (matchMode == TemplateMatchModes.SqDiff || matchMode == TemplateMatchModes.SqDiffNormed)
+                    {
+                        topLeft = minloc;
+                    }
+                    else
+                    {
+                        topLeft = maxloc;
+                    }
+                    res_rectangle.X = topLeft.X;
+                    res_rectangle.Y = topLeft.Y;
                     res_rectangle.Width = rect_image.Width;
                     res_rectangle.Height = rect_image.Height;
+
+                    //res_rectangle.X = maxloc.X;
+                    //res_rectangle.Y = maxloc.Y;
+                    //res_rectangle.Width = rect_image.Width;
+                    //res_rectangle.Height = rect_image.Height;
 
                     return true;
                 }
@@ -167,12 +196,12 @@ namespace OpenCV
         /// <param name="threshold"></param>
         /// <param name="res_rectangle"></param>
         /// <returns></returns>
-        public static bool CvTemplateMatching(BitmapSource target_image, BitmapSource rect_image, double threshold, out System.Drawing.Rectangle res_rectangle)
+        public static bool CvTemplateMatching(BitmapSource target_image, BitmapSource rect_image, double threshold, TemplateMatchModes matchModes, out System.Drawing.Rectangle res_rectangle)
         {
             using (Mat target_mat = BitmapSourceConverter.ToMat(target_image))
             using (Mat rect_mat = BitmapSourceConverter.ToMat(rect_image))
             {
-                return CvTemplateMatching(target_mat, rect_mat, threshold, out res_rectangle);
+                return CvTemplateMatching(target_mat, rect_mat, threshold, matchModes, out res_rectangle);
             }
         }
 
@@ -184,12 +213,12 @@ namespace OpenCV
         /// <param name="threshold"></param>
         /// <param name="res_rectangle"></param>
         /// <returns></returns>
-        public static bool CvTemplateMatching(string target_image_file, BitmapSource rect_image, double threshold, out System.Drawing.Rectangle res_rectangle)
+        public static bool CvTemplateMatching(string target_image_file, BitmapSource rect_image, double threshold, TemplateMatchModes matchModes, out System.Drawing.Rectangle res_rectangle)
         {
             using (Mat target_mat = new Mat(target_image_file, ImreadModes.Unchanged))
             using (Mat rect_mat = BitmapSourceConverter.ToMat(rect_image))
             {
-                return CvTemplateMatching(target_mat, rect_mat, threshold, out res_rectangle);
+                return CvTemplateMatching(target_mat, rect_mat, threshold, matchModes, out res_rectangle);
             }
         }
 
@@ -201,12 +230,12 @@ namespace OpenCV
         /// <param name="threshold"></param>
         /// <param name="res_rectangle"></param>
         /// <returns></returns>
-        public static bool CvTemplateMatching(BitmapSource target_image, string rect_image_file, double threshold, out System.Drawing.Rectangle res_rectangle)
+        public static bool CvTemplateMatching(BitmapSource target_image, string rect_image_file, double threshold, TemplateMatchModes matchModes, out System.Drawing.Rectangle res_rectangle)
         {
             using (Mat target_mat = BitmapSourceConverter.ToMat(target_image))
             using (Mat rect_mat = new Mat(rect_image_file, ImreadModes.Unchanged))
             {
-                return CvTemplateMatching(target_mat, rect_mat, threshold, out res_rectangle);
+                return CvTemplateMatching(target_mat, rect_mat, threshold, matchModes, out res_rectangle);
             }
         }
 
@@ -218,12 +247,12 @@ namespace OpenCV
         /// <param name="threshold"></param>
         /// <param name="res_rectangle"></param>
         /// <returns></returns>
-        public static bool CvTemplateMatching(string target_image_file, string rect_image_file, double threshold, out System.Drawing.Rectangle res_rectangle)
+        public static bool CvTemplateMatching(string target_image_file, string rect_image_file, double threshold, TemplateMatchModes matchModes, out System.Drawing.Rectangle res_rectangle)
         {
             using (Mat target_mat = new Mat(target_image_file, ImreadModes.Unchanged))
             using (Mat rect_mat = new Mat(rect_image_file, ImreadModes.Unchanged))
             {
-                return CvTemplateMatching(target_mat, rect_mat, threshold, out res_rectangle);
+                return CvTemplateMatching(target_mat, rect_mat, threshold, matchModes, out res_rectangle);
             }
         }
     }
