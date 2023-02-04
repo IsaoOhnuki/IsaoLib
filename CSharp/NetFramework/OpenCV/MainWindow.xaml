@@ -45,7 +45,8 @@
                           Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}"/>
             <ScrollViewer Grid.Column="0"
                           HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto">
+                          VerticalScrollBarVisibility="Auto"
+                          Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
                 <Image Source="{Binding SourceImage}"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Top"
@@ -53,17 +54,14 @@
             </ScrollViewer>
             <ScrollViewer Grid.Column="2"
                           HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto">
-                <Grid>
+                          VerticalScrollBarVisibility="Auto"
+                          Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                <Grid HorizontalAlignment="Left"
+                      VerticalAlignment="Top"
+                      Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
                     <Image x:Name="image" Source="{Binding TargetImage}"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Top"
                            Stretch="None"/>
                     <Canvas Visibility="{Binding Result, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            Width="{Binding ActualWidth, ElementName=image}"
-                            Height="{Binding ActualHeight, ElementName=image}"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Top"
                             Background="#7FFFFFFF">
                         <Rectangle Canvas.Left="{Binding ResultRect.Left}"
                                    Canvas.Top="{Binding ResultRect.Top}"
