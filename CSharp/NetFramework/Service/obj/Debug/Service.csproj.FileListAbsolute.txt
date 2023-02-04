@@ -1,9 +1,0 @@
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\bin\Debug\Service.dll
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\bin\Debug\Service.pdb
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\bin\Debug\SharedLib.dll
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\bin\Debug\SharedLib.pdb
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\obj\Debug\Service.csproj.AssemblyReference.cache
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\obj\Debug\Service.csproj.CoreCompileInputs.cache
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\obj\Debug\Service.csproj.CopyComplete
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\obj\Debug\Service.dll
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\Service\obj\Debug\Service.pdb

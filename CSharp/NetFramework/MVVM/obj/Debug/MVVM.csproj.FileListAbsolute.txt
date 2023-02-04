@@ -1,9 +1,0 @@
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\bin\Debug\MVVM.dll
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\bin\Debug\MVVM.pdb
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\obj\Debug\MVVM.csproj.AssemblyReference.cache
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\obj\Debug\MVVM.csproj.CoreCompileInputs.cache
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\obj\Debug\MVVM.dll
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\obj\Debug\MVVM.pdb
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\bin\Debug\SharedLib.dll
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\bin\Debug\SharedLib.pdb
-C:\Users\isa0_\Source\Repos\IsaoOhnuki\WpfGrande\MVVM\obj\Debug\MVVM.csproj.CopyComplete
