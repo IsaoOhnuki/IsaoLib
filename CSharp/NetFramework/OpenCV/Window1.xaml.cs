@@ -72,6 +72,14 @@ namespace OpenCV
             {
                 ImageSearch2();
             });
+            Gray = new DefaultCommand(v =>
+            {
+                ImageGray();
+            });
+            Gray2 = new DefaultCommand(v =>
+            {
+                ImageGray2();
+            });
         }
 
         public DefaultCommand OpenSource { get; }
@@ -80,6 +88,8 @@ namespace OpenCV
 
         public DefaultCommand Search { get; }
         public DefaultCommand Search2 { get; }
+        public DefaultCommand Gray { get; }
+        public DefaultCommand Gray2 { get; }
 
         public BitmapImage SourceImage
         {
@@ -151,6 +161,26 @@ namespace OpenCV
 
                 Cv2.DrawMatches(mat, key_point1, temp, key_point2, matches, output3);
                 Cv2.ImShow("output3", output3);
+            }
+        }
+
+        public void ImageGray()
+        {
+            using (Mat src = BitmapSourceConverter.ToMat(SourceImage))
+            using (Mat dst = new Mat())
+            {
+                Cv2.CvtColor(src, dst, ColorConversionCodes.RGBA2GRAY);
+                Cv2.ImShow("output2", dst);
+            }
+        }
+
+        public void ImageGray2()
+        {
+            using (Mat src = BitmapSourceConverter.ToMat(TargetImage))
+            using (Mat dst = new Mat())
+            {
+                Cv2.CvtColor(src, dst, ColorConversionCodes.RGBA2GRAY);
+                Cv2.ImShow("output2", dst);
             }
         }
     }

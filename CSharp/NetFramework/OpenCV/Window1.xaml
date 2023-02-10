@@ -20,6 +20,10 @@
                     Command="{Binding Search}"/>
             <Button Content="Search"
                     Command="{Binding Search2}"/>
+            <Button Content="Gray"
+                    Command="{Binding Gray}"/>
+            <Button Content="Gray"
+                    Command="{Binding Gray2}"/>
         </ToolBar>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
