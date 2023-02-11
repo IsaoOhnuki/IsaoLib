@@ -141,10 +141,22 @@ namespace OpenCV
                     if (flg)
                     {
                         TargetPoints = CvDetect(Target.Mat());
+                        TargetOctave.Clear();
+                        TargetPoints.
+                            Select(x => x.Octave).Distinct().OrderBy(x => x).ToList().
+                                ForEach(x => TargetOctave.Add(x));
+                        TargetOctave.Insert(0, -1);
+                        SelectedTargetOctave = -1;
                     }
                     else
                     {
                         SourcePoints = CvDetect(Source.Mat());
+                        SourceOctave.Clear();
+                        SourcePoints.
+                            Select(x => x.Octave).Distinct().OrderBy(x => x).ToList().
+                                ForEach(x => SourceOctave.Add(x));
+                        SourceOctave.Insert(0, -1);
+                        SelectedSourceOctave = -1;
                     }
                 }
             });
@@ -185,6 +197,23 @@ namespace OpenCV
         public DefaultCommand Search { get; }
 
         public ObservableCollection<string> TemplateMatchModeList { get; } = new ObservableCollection<string>();
+
+        public ObservableCollection<int> SourceOctave { get; } = new ObservableCollection<int>();
+        public ObservableCollection<int> TargetOctave { get; } = new ObservableCollection<int>();
+
+        public int SelectedSourceOctave
+        {
+            get => _selectedSourceOctave;
+            set => SetProperty(ref _selectedSourceOctave, value);
+        }
+        private int _selectedSourceOctave;
+
+        public int SelectedTargetOctave
+        {
+            get => _selectedTargetOctave;
+            set => SetProperty(ref _selectedTargetOctave, value);
+        }
+        private int _selectedTargetOctave;
 
         public KeyPoint[] SourcePoints
         {

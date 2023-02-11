@@ -7,15 +7,18 @@
         d:DataContext="{d:DesignInstance Type=local:ImageSearchViewModel}"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="313"
-        Width="448"
+        Height="600"
+        Width="800"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <ToolBar Grid.Row="0">
+        <ToolBarTray>
+            <ToolBar Template="{DynamicResource MatViewToolBar}"/>
+        </ToolBarTray>
+        <!--<ToolBar Grid.Row="0">
             <Button Content="Source"
                     Command="{Binding OpenSource}"/>
             <Button FontFamily="Segoe MDL2 Assets"
@@ -35,6 +38,9 @@
             <Button Content="Detect"
                     Command="{Binding Detect}"
                     CommandParameter="False"/>
+            <ComboBox Width="50"
+                      ItemsSource="{Binding SourceOctave}"
+                      SelectedItem="{Binding SelectedSourceOctave}"/>
             <Separator/>
             <Button Content="Target"
                     Command="{Binding OpenTarget}"/>
@@ -55,6 +61,9 @@
             <Button Content="Detect"
                     Command="{Binding Detect}"
                     CommandParameter="True"/>
+            <ComboBox Width="50"
+                      ItemsSource="{Binding TargetOctave}"
+                      SelectedItem="{Binding SelectedTargetOctave}"/>
             <Separator/>
             <ComboBox IsEditable="False"
                       IsReadOnly="True"
@@ -65,20 +74,22 @@
                      Width="50"/>
             <Button Content="Search"
                     Command="{Binding Search}"/>
-        </ToolBar>
+        </ToolBar>-->
         <Grid Grid.Row="1">
             <Grid.Resources>
                 <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             </Grid.Resources>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
             <GridSplitter Grid.Column="1"
                           HorizontalAlignment="Stretch"
                           Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}"/>
-            <ScrollViewer Grid.Column="0"
+            <local:MatView Grid.Column="0"/>
+            <local:MatView Grid.Column="2"/>
+            <!--<ScrollViewer Grid.Column="0"
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto"
                           Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
@@ -87,12 +98,12 @@
                        HorizontalAlignment="Left"
                        VerticalAlignment="Top"
                        Stretch="None"/>
-                    <local:UserControl1 ItemsSource="{Binding SourcePoints}"
-                                        Visibility="{Binding SourceResult, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Background="#7FFFFFFF"/>
+                    <local:DetectPanel Octave="{Binding SelectedSourceOctave}"
+                                        ItemsSource="{Binding SourcePoints}"
+                                        Visibility="{Binding SourceResult, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 </Grid>
-            </ScrollViewer>
-            <ScrollViewer Grid.Column="2"
+            </ScrollViewer>-->
+            <!--<ScrollViewer Grid.Column="2"
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto"
                           Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
@@ -110,11 +121,11 @@
                                    Stroke="Red"
                                    StrokeThickness="2"/>
                     </Canvas>
-                    <local:UserControl1 ItemsSource="{Binding TargetPoints}"
-                                        Visibility="{Binding TargetResult, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Background="#7FFFFFFF"/>
+                    <local:DetectPanel Octave="{Binding SelectedTargetOctave}"
+                                        ItemsSource="{Binding TargetPoints}"
+                                        Visibility="{Binding TargetResult, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 </Grid>
-            </ScrollViewer>
+            </ScrollViewer>-->
         </Grid>
     </Grid>
 </Window>

@@ -84,8 +84,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MatStack.cs" />
-    <Compile Include="UserControl1.xaml.cs">
-      <DependentUpon>UserControl1.xaml</DependentUpon>
+    <Compile Include="DetectPanel.xaml.cs">
+      <DependentUpon>DetectPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MatView.xaml.cs">
+      <DependentUpon>MatView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Window1.xaml.cs">
       <DependentUpon>Window1.xaml</DependentUpon>
@@ -105,7 +108,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UserControl1.xaml">
+    <Page Include="DetectPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MatView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
