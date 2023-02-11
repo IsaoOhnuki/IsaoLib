@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using MVVM;
 using OpenCvSharp;
+using OpenCvSharp.Dnn;
 using OpenCvSharp.WpfExtensions;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -42,12 +44,22 @@ namespace OpenCV
         public void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            UndoSource.Update();
+            RedoSource.Update();
+            UndoTarget.Update();
+            RedoTarget.Update();
+            SourceToTarget.Update();
+            TargetToSource.Update();
+            Gray.Update();
         }
         public void SetProperty<T>(ref T field, T value, [CallerMemberName] string name = null)
         {
             field = value;
             OnPropertyChanged(name);
         }
+
+        public MatStack Source { get; } = new MatStack();
+        public MatStack Target { get; } = new MatStack();
 
         public ImageSearchViewModel()
         {
@@ -56,7 +68,9 @@ namespace OpenCV
                 OpenFileDialog dialog = new OpenFileDialog();
                 if (dialog.ShowDialog() == true)
                 {
-                    SourceImage = new BitmapImage(new Uri(dialog.FileName));
+                    Source.Push(new BitmapImage(new Uri(dialog.FileName)));
+                    SourceImage = Source.Get();
+                    SourcePoints = null;
                 }
             });
             OpenTarget = new DefaultCommand(v =>
@@ -64,22 +78,88 @@ namespace OpenCV
                 OpenFileDialog dialog = new OpenFileDialog();
                 if (dialog.ShowDialog() == true)
                 {
-                    TargetImage = new BitmapImage(new Uri(dialog.FileName));
-                    Result = false;
+                    Target.Push(new BitmapImage(new Uri(dialog.FileName)));
+                    TargetImage = Target.Get();
+                    TargetPoints = null;
+                    SearchResult = false;
+                }
+            });
+            UndoSource = new DefaultCommand(v =>
+            {
+                Source.Undo();
+                SourceImage = Source.Get();
+            }, v => Source.CanUndo);
+            RedoSource = new DefaultCommand(v =>
+            {
+                Source.Redo();
+                SourceImage = Source.Get();
+            }, v => Source.CanRedo);
+            UndoTarget = new DefaultCommand(v =>
+            {
+                Target.Undo();
+                TargetImage = Target.Get();
+            }, v => Target.CanUndo);
+            RedoTarget = new DefaultCommand(v =>
+            {
+                Target.Redo();
+                TargetImage = Target.Get();
+            }, v => Target.CanRedo);
+            SourceToTarget = new DefaultCommand(v =>
+            {
+                Target.Push(Source.Get());
+                TargetImage = Target.Get();
+            }, v => TargetImage != null && SourceImage != null);
+            TargetToSource = new DefaultCommand(v =>
+            {
+                Source.Push(Target.Get());
+                SourceImage = Source.Get();
+            }, v => TargetImage != null && SourceImage != null);
+            Gray = new DefaultCommand(v =>
+            {
+                if (bool.Parse(v.ToString()) is bool flg)
+                {
+                    Mat dst = CvGray(flg ? Target.Mat() : Source.Mat());
+                    if (dst != null)
+                    {
+                        if (flg)
+                        {
+                            Target.Push(dst);
+                            TargetImage = Target.Get();
+                        }
+                        else
+                        {
+                            Source.Push(dst);
+                            SourceImage = Source.Get();
+                        }
+                    }
+                }
+            }, v => SourceImage != null);
+            Detect = new DefaultCommand(v =>
+            {
+                if (bool.Parse(v.ToString()) is bool flg)
+                {
+                    if (flg)
+                    {
+                        TargetPoints = CvDetect(Target.Mat());
+                    }
+                    else
+                    {
+                        SourcePoints = CvDetect(Source.Mat());
+                    }
                 }
             });
             Search = new DefaultCommand(v =>
             {
                 TemplateMatchModes matchMode =
                     (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                if (CvTemplateMatching(TargetImage, SourceImage, Threshold, matchMode, out System.Drawing.Rectangle match))
+                if (CvTemplateMatching(Target.Mat(), Source.Mat(), Threshold, matchMode, out System.Drawing.Rectangle match))
                 {
-                    Result = true;
+                    SearchResult = true;
                     ResultRect = new System.Windows.Rect(match.X, match.Y, match.Width, match.Height);
                 }
                 else
                 {
-                    Result = false;
+                    SearchResult = false;
                 }
             });
 
@@ -89,12 +169,44 @@ namespace OpenCV
         }
 
         public DefaultCommand OpenSource { get; }
+        public DefaultCommand UndoSource { get; }
+        public DefaultCommand RedoSource { get; }
 
         public DefaultCommand OpenTarget { get; }
+        public DefaultCommand UndoTarget { get; }
+        public DefaultCommand RedoTarget { get; }
+
+        public DefaultCommand Gray { get; }
+        public DefaultCommand Detect { get; }
+
+        public DefaultCommand SourceToTarget { get; }
+        public DefaultCommand TargetToSource { get; }
 
         public DefaultCommand Search { get; }
 
         public ObservableCollection<string> TemplateMatchModeList { get; } = new ObservableCollection<string>();
+
+        public KeyPoint[] SourcePoints
+        {
+            get => _sourcePoints;
+            set
+            {
+                SetProperty(ref _sourcePoints, value);
+                OnPropertyChanged(nameof(SourceResult));
+            }
+        }
+        private KeyPoint[] _sourcePoints;
+
+        public KeyPoint[] TargetPoints
+        {
+            get => _targetPoints;
+            set
+            {
+                SetProperty(ref _targetPoints, value);
+                OnPropertyChanged(nameof(TargetResult));
+            }
+        }
+        private KeyPoint[] _targetPoints;
 
         public string SelectedTemplateMatchMode
         {
@@ -103,19 +215,19 @@ namespace OpenCV
         }
         private string _selectedTemplateMatchMode;
 
-        public BitmapImage SourceImage
+        public BitmapSource SourceImage
         {
             get => _sourceImage;
             set => SetProperty(ref _sourceImage, value);
         }
-        private BitmapImage _sourceImage;
+        private BitmapSource _sourceImage;
 
-        public BitmapImage TargetImage
+        public BitmapSource TargetImage
         {
             get => _targetImage;
             set => SetProperty(ref _targetImage, value);
         }
-        private BitmapImage _targetImage;
+        private BitmapSource _targetImage;
 
         public System.Windows.Rect ResultRect
         {
@@ -124,12 +236,14 @@ namespace OpenCV
         }
         private System.Windows.Rect _resultRect;
 
-        public bool Result
+        public bool SourceResult => SourcePoints != null && SourcePoints.Length > 0;
+        public bool TargetResult => TargetPoints != null && TargetPoints.Length > 0;
+        public bool SearchResult
         {
-            get => _result;
-            set => SetProperty(ref _result, value);
+            get => _searchResult;
+            set => SetProperty(ref _searchResult, value);
         }
-        private bool _result;
+        private bool _searchResult;
 
         public double Threshold
         {
@@ -152,8 +266,15 @@ namespace OpenCV
 
             using (Mat result = new Mat())
             {
-                //画像認識
-                Cv2.MatchTemplate(target_image, rect_image, result, matchMode);
+                try
+                {
+                    //画像認識
+                    Cv2.MatchTemplate(target_image, rect_image, result, matchMode);
+                }
+                catch
+                {
+                    return false;
+                }
 
                 // 類似度が最大/最小となる画素の位置を調べる
                 Cv2.MinMaxLoc(result, out double minval, out double maxval, out OpenCvSharp.Point minloc, out OpenCvSharp.Point maxloc);
@@ -177,83 +298,33 @@ namespace OpenCV
                     res_rectangle.Width = rect_image.Width;
                     res_rectangle.Height = rect_image.Height;
 
-                    //res_rectangle.X = maxloc.X;
-                    //res_rectangle.Y = maxloc.Y;
-                    //res_rectangle.Width = rect_image.Width;
-                    //res_rectangle.Height = rect_image.Height;
-
                     return true;
                 }
             }
             return false;
         }
 
-        /// <summary>
-        /// ImageをMatに変換して画像認識処理に渡す
-        /// </summary>
-        /// <param name="target_image"></param>
-        /// <param name="rect_image"></param>
-        /// <param name="threshold"></param>
-        /// <param name="res_rectangle"></param>
-        /// <returns></returns>
-        public static bool CvTemplateMatching(BitmapSource target_image, BitmapSource rect_image, double threshold, TemplateMatchModes matchModes, out System.Drawing.Rectangle res_rectangle)
+        public Mat CvGray(Mat Src)
         {
-            using (Mat target_mat = BitmapSourceConverter.ToMat(target_image))
-            using (Mat rect_mat = BitmapSourceConverter.ToMat(rect_image))
+            Mat dst = new Mat();
+            try
             {
-                return CvTemplateMatching(target_mat, rect_mat, threshold, matchModes, out res_rectangle);
+                Cv2.CvtColor(Src, dst, ColorConversionCodes.RGBA2GRAY);
             }
+            catch
+            {
+                dst.Dispose();
+                dst = null;
+            }
+            return dst;
         }
 
-        /// <summary>
-        /// ImageとFileをMatに変換して画像認識処理に渡す
-        /// </summary>
-        /// <param name="target_image_file"></param>
-        /// <param name="rect_image"></param>
-        /// <param name="threshold"></param>
-        /// <param name="res_rectangle"></param>
-        /// <returns></returns>
-        public static bool CvTemplateMatching(string target_image_file, BitmapSource rect_image, double threshold, TemplateMatchModes matchModes, out System.Drawing.Rectangle res_rectangle)
+        public KeyPoint[] CvDetect(Mat src)
         {
-            using (Mat target_mat = new Mat(target_image_file, ImreadModes.Unchanged))
-            using (Mat rect_mat = BitmapSourceConverter.ToMat(rect_image))
-            {
-                return CvTemplateMatching(target_mat, rect_mat, threshold, matchModes, out res_rectangle);
-            }
-        }
-
-        /// <summary>
-        /// ImageとFileをMatに変換して画像認識処理に渡す
-        /// </summary>
-        /// <param name="target_image"></param>
-        /// <param name="rect_image_file"></param>
-        /// <param name="threshold"></param>
-        /// <param name="res_rectangle"></param>
-        /// <returns></returns>
-        public static bool CvTemplateMatching(BitmapSource target_image, string rect_image_file, double threshold, TemplateMatchModes matchModes, out System.Drawing.Rectangle res_rectangle)
-        {
-            using (Mat target_mat = BitmapSourceConverter.ToMat(target_image))
-            using (Mat rect_mat = new Mat(rect_image_file, ImreadModes.Unchanged))
-            {
-                return CvTemplateMatching(target_mat, rect_mat, threshold, matchModes, out res_rectangle);
-            }
-        }
-
-        /// <summary>
-        /// FileをMatに変換して画像認識処理に渡す
-        /// </summary>
-        /// <param name="target_image_file"></param>
-        /// <param name="rect_image_file"></param>
-        /// <param name="threshold"></param>
-        /// <param name="res_rectangle"></param>
-        /// <returns></returns>
-        public static bool CvTemplateMatching(string target_image_file, string rect_image_file, double threshold, TemplateMatchModes matchModes, out System.Drawing.Rectangle res_rectangle)
-        {
-            using (Mat target_mat = new Mat(target_image_file, ImreadModes.Unchanged))
-            using (Mat rect_mat = new Mat(rect_image_file, ImreadModes.Unchanged))
-            {
-                return CvTemplateMatching(target_mat, rect_mat, threshold, matchModes, out res_rectangle);
-            }
+            //AKAZEのセットアップ
+            AKAZE akaze = AKAZE.Create();
+            //特徴量の検出と特徴量ベクトルの計算
+            return akaze.Detect(src, null);
         }
     }
 }

@@ -18,8 +18,43 @@
         <ToolBar Grid.Row="0">
             <Button Content="Source"
                     Command="{Binding OpenSource}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE7A7;"
+                    Command="{Binding UndoSource}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE7A6;"
+                    Command="{Binding RedoSource}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE72A;"
+                    Command="{Binding SourceToTarget}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE73B;"
+                    Command="{Binding Gray}"
+                    CommandParameter="False"
+                    Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+            <Button Content="Detect"
+                    Command="{Binding Detect}"
+                    CommandParameter="False"/>
+            <Separator/>
             <Button Content="Target"
                     Command="{Binding OpenTarget}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE7A7;"
+                    Command="{Binding UndoTarget}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE7A6;"
+                    Command="{Binding RedoTarget}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE72B;"
+                    Command="{Binding TargetToSource}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE73B;"
+                    Command="{Binding Gray}"
+                    CommandParameter="True"
+                    Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+            <Button Content="Detect"
+                    Command="{Binding Detect}"
+                    CommandParameter="True"/>
             <Separator/>
             <ComboBox IsEditable="False"
                       IsReadOnly="True"
@@ -47,10 +82,15 @@
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto"
                           Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                <Image Source="{Binding SourceImage}"
+                <Grid>
+                    <Image Source="{Binding SourceImage}"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Top"
                        Stretch="None"/>
+                    <local:UserControl1 ItemsSource="{Binding SourcePoints}"
+                                        Visibility="{Binding SourceResult, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        Background="#7FFFFFFF"/>
+                </Grid>
             </ScrollViewer>
             <ScrollViewer Grid.Column="2"
                           HorizontalScrollBarVisibility="Auto"
@@ -59,9 +99,9 @@
                 <Grid HorizontalAlignment="Left"
                       VerticalAlignment="Top"
                       Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
-                    <Image x:Name="image" Source="{Binding TargetImage}"
+                    <Image Source="{Binding TargetImage}"
                            Stretch="None"/>
-                    <Canvas Visibility="{Binding Result, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    <Canvas Visibility="{Binding SearchResult, Converter={StaticResource BooleanToVisibilityConverter}}"
                             Background="#7FFFFFFF">
                         <Rectangle Canvas.Left="{Binding ResultRect.Left}"
                                    Canvas.Top="{Binding ResultRect.Top}"
@@ -70,6 +110,9 @@
                                    Stroke="Red"
                                    StrokeThickness="2"/>
                     </Canvas>
+                    <local:UserControl1 ItemsSource="{Binding TargetPoints}"
+                                        Visibility="{Binding TargetResult, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        Background="#7FFFFFFF"/>
                 </Grid>
             </ScrollViewer>
         </Grid>
