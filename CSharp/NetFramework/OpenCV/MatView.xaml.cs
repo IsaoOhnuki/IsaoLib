@@ -30,7 +30,64 @@ namespace OpenCV
         {
             InitializeComponent();
 
-            DataContext = new MatViewModel();
+            MatViewModel model = new MatViewModel();
+            model.PropertyChanged += ModelChanged;
+            DataContext = model;
+        }
+
+        private void ModelChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is MatViewModel model &&
+                e.PropertyName == nameof(MatViewModel.SourceImage))
+            {
+                Image = model.Source.Mat();
+            }
+        }
+
+        public Mat Image
+        {
+            get { return (Mat)GetValue(ImageProperty); }
+            set { SetValue(ImageProperty, value); }
+        }
+
+        public static readonly DependencyProperty ImageProperty =
+            DependencyProperty.Register(
+                nameof(Image),
+                typeof(Mat),
+                typeof(MatView),
+                new FrameworkPropertyMetadata(
+                    default,
+                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        public System.Windows.Rect? SerchRect
+        {
+            get { return (System.Windows.Rect?)GetValue(SerchRectProperty); }
+            set { SetValue(SerchRectProperty, value); }
+        }
+
+        public static readonly DependencyProperty SerchRectProperty =
+            DependencyProperty.Register(
+                nameof(SerchRect),
+                typeof(System.Windows.Rect?),
+                typeof(MatView),
+                new PropertyMetadata(
+                    default,
+                    (s, e) =>
+                    {
+                        if (s is MatView view &&
+                            view.DataContext is MatViewModel model)
+                        {
+                            model.SearchRect = e.NewValue as System.Windows.Rect?;
+                        }
+                    }));
+
+        public void Set(Mat mat)
+        {
+            if (DataContext is MatViewModel model)
+            {
+                model.Source.Push(mat);
+                model.SourceImage = model.Source.Get();
+            }
         }
     }
 
@@ -47,8 +104,12 @@ namespace OpenCV
         }
         public void SetProperty<T>(ref T field, T value, [CallerMemberName] string name = null)
         {
-            field = value;
-            OnPropertyChanged(name);
+            if (field == null && value != null ||
+                field != null && !field.Equals(value))
+            {
+                field = value;
+                OnPropertyChanged(name);
+            }
         }
 
         public MatStack Source { get; } = new MatStack();
@@ -87,6 +148,7 @@ namespace OpenCV
             Detect = new DefaultCommand(v =>
             {
                 SourcePoints = CvDetect(Source.Mat());
+                SelectedSourceOctave = null;
                 SourceOctave.Clear();
                 SourcePoints.
                     Select(x => x.Octave).Distinct().OrderBy(x => x).ToList().
@@ -105,12 +167,12 @@ namespace OpenCV
 
         public ObservableCollection<int> SourceOctave { get; } = new ObservableCollection<int>();
 
-        public int SelectedSourceOctave
+        public int? SelectedSourceOctave
         {
             get => _selectedSourceOctave;
             set => SetProperty(ref _selectedSourceOctave, value);
         }
-        private int _selectedSourceOctave;
+        private int? _selectedSourceOctave;
 
         public KeyPoint[] SourcePoints
         {
@@ -130,20 +192,20 @@ namespace OpenCV
         }
         private BitmapSource _sourceImage;
 
-        public System.Windows.Rect ResultRect
+        public System.Windows.Rect? SearchRect
         {
-            get => _resultRect;
-            set => SetProperty(ref _resultRect, value);
+            get => _searchRect;
+            set
+            {
+                SetProperty(ref _searchRect, value);
+                OnPropertyChanged(nameof(SearchResult));
+            }
         }
-        private System.Windows.Rect _resultRect;
+        private System.Windows.Rect? _searchRect;
 
         public bool SourceResult => SourcePoints != null && SourcePoints.Length > 0;
-        public bool SearchResult
-        {
-            get => _searchResult;
-            set => SetProperty(ref _searchResult, value);
-        }
-        private bool _searchResult;
+        
+        public bool SearchResult => SearchRect.HasValue;
 
         public Mat CvGray(Mat Src)
         {

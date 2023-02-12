@@ -59,22 +59,6 @@ namespace OpenCV
                         }
                     }));
 
-        public int MaxOctave
-        {
-            get => (int)GetValue(MaxOctaveProperty);
-            private set => SetValue(MaxOctavePropertyKey, value);
-        }
-
-        public static readonly DependencyProperty MaxOctaveProperty =
-            MaxOctavePropertyKey?.DependencyProperty;
-
-        public static readonly DependencyPropertyKey MaxOctavePropertyKey =
-            DependencyProperty.RegisterReadOnly(
-                nameof(MaxOctave),
-                typeof(int),
-                typeof(DetectPanel),
-                new PropertyMetadata(0));
-
         public KeyPoint[] ItemsSource
         {
             get => (KeyPoint[])GetValue(ItemsSourceProperty);
@@ -122,7 +106,6 @@ namespace OpenCV
                                     ctrl.canvas.Children.Add(path);
                                 }
                             });
-                            ctrl.MaxOctave = ctrl.AnchorCollection.Select(x => (int)x.Tag).Max();
                         }
                     }));
     }

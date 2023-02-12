@@ -18,53 +18,13 @@
         <ToolBarTray>
             <ToolBar Template="{DynamicResource MatViewToolBar}"/>
         </ToolBarTray>
-        <!--<ToolBar Grid.Row="0">
-            <Button Content="Source"
-                    Command="{Binding OpenSource}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE7A7;"
-                    Command="{Binding UndoSource}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE7A6;"
-                    Command="{Binding RedoSource}"/>
+        <ToolBar Grid.Row="0">
             <Button FontFamily="Segoe MDL2 Assets"
                     Content="&#xE72A;"
                     Command="{Binding SourceToTarget}"/>
             <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE73B;"
-                    Command="{Binding Gray}"
-                    CommandParameter="False"
-                    Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
-            <Button Content="Detect"
-                    Command="{Binding Detect}"
-                    CommandParameter="False"/>
-            <ComboBox Width="50"
-                      ItemsSource="{Binding SourceOctave}"
-                      SelectedItem="{Binding SelectedSourceOctave}"/>
-            <Separator/>
-            <Button Content="Target"
-                    Command="{Binding OpenTarget}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE7A7;"
-                    Command="{Binding UndoTarget}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE7A6;"
-                    Command="{Binding RedoTarget}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
                     Content="&#xE72B;"
                     Command="{Binding TargetToSource}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE73B;"
-                    Command="{Binding Gray}"
-                    CommandParameter="True"
-                    Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
-            <Button Content="Detect"
-                    Command="{Binding Detect}"
-                    CommandParameter="True"/>
-            <ComboBox Width="50"
-                      ItemsSource="{Binding TargetOctave}"
-                      SelectedItem="{Binding SelectedTargetOctave}"/>
-            <Separator/>
             <ComboBox IsEditable="False"
                       IsReadOnly="True"
                       Width="100"
@@ -74,7 +34,9 @@
                      Width="50"/>
             <Button Content="Search"
                     Command="{Binding Search}"/>
-        </ToolBar>-->
+            <Button Content="SearchClear"
+                    Command="{Binding SearchClear}"/>
+        </ToolBar>
         <Grid Grid.Row="1">
             <Grid.Resources>
                 <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -87,45 +49,12 @@
             <GridSplitter Grid.Column="1"
                           HorizontalAlignment="Stretch"
                           Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}"/>
-            <local:MatView Grid.Column="0"/>
-            <local:MatView Grid.Column="2"/>
-            <!--<ScrollViewer Grid.Column="0"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                <Grid>
-                    <Image Source="{Binding SourceImage}"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Stretch="None"/>
-                    <local:DetectPanel Octave="{Binding SelectedSourceOctave}"
-                                        ItemsSource="{Binding SourcePoints}"
-                                        Visibility="{Binding SourceResult, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                </Grid>
-            </ScrollViewer>-->
-            <!--<ScrollViewer Grid.Column="2"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                <Grid HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
-                    <Image Source="{Binding TargetImage}"
-                           Stretch="None"/>
-                    <Canvas Visibility="{Binding SearchResult, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            Background="#7FFFFFFF">
-                        <Rectangle Canvas.Left="{Binding ResultRect.Left}"
-                                   Canvas.Top="{Binding ResultRect.Top}"
-                                   Width="{Binding ResultRect.Width}"
-                                   Height="{Binding ResultRect.Height}"
-                                   Stroke="Red"
-                                   StrokeThickness="2"/>
-                    </Canvas>
-                    <local:DetectPanel Octave="{Binding SelectedTargetOctave}"
-                                        ItemsSource="{Binding TargetPoints}"
-                                        Visibility="{Binding TargetResult, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                </Grid>
-            </ScrollViewer>-->
+            <local:MatView x:Name="sourceImage"
+                           Grid.Column="0"
+                           Image="{Binding DataContext.SourceImage, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+            <local:MatView x:Name="targetImage"
+                           Grid.Column="2"
+                           Image="{Binding DataContext.TargetImage, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
         </Grid>
     </Grid>
 </Window>

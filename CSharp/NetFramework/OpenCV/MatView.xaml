@@ -58,7 +58,7 @@
                     CommandParameter="False"/>
             <ComboBox Width="50"
                       ItemsSource="{Binding SourceOctave}"
-                      SelectedItem="{Binding SelectedSourceOctave}"/>
+                      SelectedValue="{Binding SelectedSourceOctave}"/>
         </ToolBar>
         <ScrollViewer Grid.Row="1"
                       HorizontalScrollBarVisibility="Auto"
@@ -71,10 +71,10 @@
                        Stretch="None"/>
                 <Canvas Visibility="{Binding SearchResult, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Background="#7FFFFFFF">
-                    <Rectangle Canvas.Left="{Binding ResultRect.Left}"
-                               Canvas.Top="{Binding ResultRect.Top}"
-                               Width="{Binding ResultRect.Width}"
-                               Height="{Binding ResultRect.Height}"
+                    <Rectangle Canvas.Left="{Binding SearchRect.Left}"
+                               Canvas.Top="{Binding SearchRect.Top}"
+                               Width="{Binding SearchRect.Width}"
+                               Height="{Binding SearchRect.Height}"
                                Stroke="Red"
                                StrokeThickness="2"/>
                 </Canvas>
