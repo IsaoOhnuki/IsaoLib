@@ -70,19 +70,28 @@ namespace OpenCV
             }, v => TargetImage != null);
             SearchClear = new DefaultCommand(v =>
             {
-                TargetMatView.SerchRect = null;
-            }, v => TargetMatView.SerchRect != null);
+                TargetMatView.SearchElements = null;
+            }, v => TargetMatView.SearchElements != null);
             Search = new DefaultCommand(v =>
             {
                 TemplateMatchModes matchMode =
                     (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
                 if (CvTemplateMatching(TargetImage, SourceImage, Threshold, matchMode, out System.Windows.Rect match))
                 {
-                    TargetMatView.SerchRect = match;
+                    TargetMatView.SearchElements = new System.Windows.Point[][]
+                    {
+                        new System.Windows.Point[]
+                        {
+                            new System.Windows.Point(match.Left, match.Top),
+                            new System.Windows.Point(match.Right, match.Top),
+                            new System.Windows.Point(match.Right, match.Bottom),
+                            new System.Windows.Point(match.Left, match.Bottom),
+                        },
+                    };
                 }
                 else
                 {
-                    TargetMatView.SerchRect = null;
+                    TargetMatView.SearchElements = null;
                 }
                 SearchClear.Update();
             }, v => SourceImage != null && TargetImage != null);

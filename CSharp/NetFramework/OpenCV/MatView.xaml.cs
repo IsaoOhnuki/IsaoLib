@@ -59,28 +59,6 @@ namespace OpenCV
                     default,
                     FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        public System.Windows.Rect? SerchRect
-        {
-            get { return (System.Windows.Rect?)GetValue(SerchRectProperty); }
-            set { SetValue(SerchRectProperty, value); }
-        }
-
-        public static readonly DependencyProperty SerchRectProperty =
-            DependencyProperty.Register(
-                nameof(SerchRect),
-                typeof(System.Windows.Rect?),
-                typeof(MatView),
-                new PropertyMetadata(
-                    default,
-                    (s, e) =>
-                    {
-                        if (s is MatView view &&
-                            view.DataContext is MatViewModel model)
-                        {
-                            model.SearchRect = e.NewValue as System.Windows.Rect?;
-                        }
-                    }));
-
         public void Set(Mat mat)
         {
             if (DataContext is MatViewModel model)
@@ -89,6 +67,30 @@ namespace OpenCV
                 model.SourceImage = model.Source.Get();
             }
         }
+
+        public System.Windows.Point[][] SearchElements
+        {
+            get => searchPanel.ItemsSource;
+            set
+            {
+                searchPanel.ItemsSource = value;
+                SearchResult = searchPanel.ItemsSource != null;
+            }
+        }
+
+        public bool SearchResult
+        {
+            get { return (bool)GetValue(SearchResultProperty); }
+            set { SetValue(SearchResultProperty, value); }
+        }
+
+        public static readonly DependencyProperty SearchResultProperty =
+            DependencyProperty.Register(
+                nameof(SearchResult),
+                typeof(bool),
+                typeof(MatView),
+                new FrameworkPropertyMetadata(false,
+                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
     }
 
     public class MatViewModel : INotifyPropertyChanged

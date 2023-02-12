@@ -7,6 +7,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
         <ControlTemplate x:Key="MatViewToolBar" TargetType="ToolBar">
             <ToolBar>
                 <Button Content="Source"
@@ -32,9 +34,6 @@
         </ControlTemplate>
     </UserControl.Resources>
     <Grid>
-        <Grid.Resources>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
@@ -78,6 +77,11 @@
                                Stroke="Red"
                                StrokeThickness="2"/>
                 </Canvas>
+                <local:SearchPanel x:Name="searchPanel"
+                                   Background="#7FFFFFFF"
+                                   Visibility="{Binding SearchResult,
+                                                        RelativeSource={RelativeSource AncestorType={x:Type UserControl}},
+                                                        Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 <local:DetectPanel Octave="{Binding SelectedSourceOctave}"
                                    ItemsSource="{Binding SourcePoints}"
                                    Visibility="{Binding SourceResult, Converter={StaticResource BooleanToVisibilityConverter}}"/>
