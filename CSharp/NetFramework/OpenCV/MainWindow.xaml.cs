@@ -100,9 +100,18 @@ namespace OpenCV
 
             Match = new DefaultCommand(v =>
             {
+                //CvMatch(SourceImage, TargetImage);
                 TemplateMatchModes matchMode =
                     (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                CvMatch(SourceImage, TargetImage, Threshold, matchMode);
+                CvMatch(SourceImage, TargetImage, Threshold, matchMode, out OpenCvSharp.Rect[] matches);
+                TargetMatView.SearchElements = matches.
+                    Select(x => new System.Windows.Point[]
+                    {
+                        new System.Windows.Point(x.Left, x.Top),
+                        new System.Windows.Point(x.Right, x.Top),
+                        new System.Windows.Point(x.Right, x.Bottom),
+                        new System.Windows.Point(x.Left, x.Bottom),
+                    }).ToArray();
             });
 
             Enum.GetNames(typeof(TemplateMatchModes)).ToList().
@@ -224,22 +233,35 @@ namespace OpenCV
                 akaze.DetectAndCompute(dst, null, out KeyPoint[] keyPoints2, dstDescriptor);
 
                 DescriptorMatcher matcher = DescriptorMatcher.Create("BruteForce");
-                DMatch[] matches = matcher.Match(srcDescriptor, dstDescriptor);
+                //DMatch[] matches = matcher.Match(srcDescriptor, dstDescriptor);
+                //Cv2.DrawMatches(src, keyPoints1, dst, keyPoints2, matches, output3);
+                //Cv2.ImShow("output3", output3);
 
-                Cv2.DrawMatches(src, keyPoints1, dst, keyPoints2, matches, output3);
-                Cv2.ImShow("output3", output3);
+                DMatch[][] matchess = matcher.KnnMatch(srcDescriptor, dstDescriptor, 3);
+                matchess.Select((x, i) => (x, i)).ToList().ForEach(x =>
+                {
+                    Cv2.DrawMatches(src, keyPoints1, dst, keyPoints2, x.x, output3);
+                    Cv2.ImShow("output" + x.i.ToString(), output3);
+                });
             }
         }
 
-        public void CvMatch(Mat tmpMat, Mat refMat, double threshold, TemplateMatchModes matchMode)
+        //https://surigoma.hateblo.jp/entry/2017/01/05/005119
+        //https://moitkfm.blogspot.com/2014/06/blog-post_10.html
+        //https://pfpfdev.hatenablog.com/entry/20200716/1594909766
+        //https://qiita.com/sitar-harmonics/items/41d54dbfc6c81b87b905
+        public void CvMatch(Mat tmpMat, Mat refMat, double threshold, TemplateMatchModes matchMode, out OpenCvSharp.Rect[] matches)
         {
             using (Mat res = new Mat(refMat.Rows - tmpMat.Rows + 1, refMat.Cols - tmpMat.Cols + 1, MatType.CV_32FC1))
             //Convert input images to gray
-            using (Mat grayRef = refMat.CvtColor(ColorConversionCodes.BGR2GRAY))
-            using (Mat grayTmp = tmpMat.CvtColor(ColorConversionCodes.BGR2GRAY))
+            using (Mat grayRef = refMat.Type().Channels > 1
+                ? refMat.CvtColor(ColorConversionCodes.BGR2GRAY) : refMat.Clone())
+            using (Mat grayTmp = tmpMat.Type().Channels > 1 ? tmpMat.CvtColor(ColorConversionCodes.BGR2GRAY) : tmpMat.Clone())
             {
-                Cv2.MatchTemplate(grayRef, grayTmp, res, TemplateMatchModes.CCoeffNormed);
+                Cv2.MatchTemplate(grayRef, grayTmp, res, matchMode);
                 Cv2.Threshold(res, res, threshold, 1.0, ThresholdTypes.Tozero);
+
+                List<OpenCvSharp.Rect> rects = new List<OpenCvSharp.Rect>();
 
                 while (true)
                 {
@@ -250,12 +272,10 @@ namespace OpenCV
                     if (maxval >= threshold)
                     {
                         //Setup the rectangle to draw
-                        OpenCvSharp.Rect r = new OpenCvSharp.Rect(
+                        OpenCvSharp.Rect rect = new OpenCvSharp.Rect(
                             new OpenCvSharp.Point(maxloc.X, maxloc.Y),
                             new OpenCvSharp.Size(tmpMat.Width, tmpMat.Height));
-
-                        //Draw a rectangle of the matching area
-                        Cv2.Rectangle(refMat, r, Scalar.LimeGreen, 2);
+                        rects.Add(rect);
 
                         //Fill in the res Mat so you don't find the same area again in the MinMaxLoc
                         Cv2.FloodFill(res, maxloc, new Scalar(0), out OpenCvSharp.Rect _, new Scalar(0.1), new Scalar(1.0));
@@ -264,8 +284,7 @@ namespace OpenCV
                         break;
                 }
 
-                Cv2.ImShow("Matches", refMat);
-                Cv2.WaitKey();
+                matches = rects.ToArray();
             }
         }
     }
