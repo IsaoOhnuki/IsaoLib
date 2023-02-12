@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -228,7 +229,7 @@ namespace OpenCV
         {
             //AKAZEのセットアップ
             AKAZE akaze = AKAZE.Create();
-            //特徴量の検出と特徴量ベクトルの計算
+            //特徴量の検出
             return akaze.Detect(src, null);
         }
     }

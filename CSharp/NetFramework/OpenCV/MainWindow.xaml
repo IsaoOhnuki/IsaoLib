@@ -36,6 +36,9 @@
                     Command="{Binding Search}"/>
             <Button Content="SearchClear"
                     Command="{Binding SearchClear}"/>
+            <Separator/>
+            <Button Content="Match"
+                    Command="{Binding Match}"/>
         </ToolBar>
         <Grid Grid.Row="1">
             <Grid.Resources>

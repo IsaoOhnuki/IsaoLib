@@ -12,7 +12,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.UI;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -96,6 +98,13 @@ namespace OpenCV
                 SearchClear.Update();
             }, v => SourceImage != null && TargetImage != null);
 
+            Match = new DefaultCommand(v =>
+            {
+                TemplateMatchModes matchMode =
+                    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                CvMatch(SourceImage, TargetImage, Threshold, matchMode);
+            });
+
             Enum.GetNames(typeof(TemplateMatchModes)).ToList().
                 ForEach(name => TemplateMatchModeList.Add(name));
             SelectedTemplateMatchMode = TemplateMatchModes.CCoeffNormed.ToString();
@@ -106,6 +115,8 @@ namespace OpenCV
 
         public DefaultCommand Search { get; }
         public DefaultCommand SearchClear { get; }
+
+        public DefaultCommand Match { get; }
 
         public ObservableCollection<string> TemplateMatchModeList { get; } = new ObservableCollection<string>();
 
@@ -145,7 +156,7 @@ namespace OpenCV
             get => _threshold;
             set => SetProperty(ref _threshold, value);
         }
-        private double _threshold;
+        private double _threshold = 0.1;
 
         /// <summary>
         /// 画像認識処理
@@ -198,6 +209,64 @@ namespace OpenCV
                 }
             }
             return false;
+        }
+
+        public void CvMatch(Mat src, Mat dst)
+        {
+            using (Mat srcDescriptor = new Mat())
+            using (Mat dstDescriptor = new Mat())
+            using (Mat output3 = new Mat())
+            {
+                //AKAZEのセットアップ
+                AKAZE akaze = AKAZE.Create();
+                //特徴量の検出と特徴量ベクトルの計算
+                akaze.DetectAndCompute(src, null, out KeyPoint[] keyPoints1, srcDescriptor);
+                akaze.DetectAndCompute(dst, null, out KeyPoint[] keyPoints2, dstDescriptor);
+
+                DescriptorMatcher matcher = DescriptorMatcher.Create("BruteForce");
+                DMatch[] matches = matcher.Match(srcDescriptor, dstDescriptor);
+
+                Cv2.DrawMatches(src, keyPoints1, dst, keyPoints2, matches, output3);
+                Cv2.ImShow("output3", output3);
+            }
+        }
+
+        public void CvMatch(Mat tmpMat, Mat refMat, double threshold, TemplateMatchModes matchMode)
+        {
+            using (Mat res = new Mat(refMat.Rows - tmpMat.Rows + 1, refMat.Cols - tmpMat.Cols + 1, MatType.CV_32FC1))
+            //Convert input images to gray
+            using (Mat grayRef = refMat.CvtColor(ColorConversionCodes.BGR2GRAY))
+            using (Mat grayTmp = tmpMat.CvtColor(ColorConversionCodes.BGR2GRAY))
+            {
+                Cv2.MatchTemplate(grayRef, grayTmp, res, TemplateMatchModes.CCoeffNormed);
+                Cv2.Threshold(res, res, threshold, 1.0, ThresholdTypes.Tozero);
+
+                while (true)
+                {
+                    double minval, maxval;
+                    OpenCvSharp.Point minloc, maxloc;
+                    Cv2.MinMaxLoc(res, out minval, out maxval, out minloc, out maxloc);
+
+                    if (maxval >= threshold)
+                    {
+                        //Setup the rectangle to draw
+                        OpenCvSharp.Rect r = new OpenCvSharp.Rect(
+                            new OpenCvSharp.Point(maxloc.X, maxloc.Y),
+                            new OpenCvSharp.Size(tmpMat.Width, tmpMat.Height));
+
+                        //Draw a rectangle of the matching area
+                        Cv2.Rectangle(refMat, r, Scalar.LimeGreen, 2);
+
+                        //Fill in the res Mat so you don't find the same area again in the MinMaxLoc
+                        Cv2.FloodFill(res, maxloc, new Scalar(0), out OpenCvSharp.Rect _, new Scalar(0.1), new Scalar(1.0));
+                    }
+                    else
+                        break;
+                }
+
+                Cv2.ImShow("Matches", refMat);
+                Cv2.WaitKey();
+            }
         }
     }
 }
