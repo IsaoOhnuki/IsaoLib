@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using MVVM;
 using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static OpenCvSharp.Stitcher;
 
 namespace OpenCV
 {
@@ -69,6 +71,17 @@ namespace OpenCV
             }
         }
 
+        public Mat Mask()
+        {
+            Mat result = null;
+            if (DataContext is MatViewModel model &&
+                model.MaskImage != null)
+            {
+                result = BitmapSourceConverter.ToMat(model.MaskImage);
+            }
+            return result;
+        }
+
         public System.Windows.Point[][] SearchElements
         {
             get => searchPanel.ItemsSource;
@@ -102,7 +115,12 @@ namespace OpenCV
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             UndoSource.Update();
             RedoSource.Update();
+            ToMask.Update();
             Gray.Update();
+            GrayReverse.Update();
+            Binary.Update();
+            MedianBlur.Update();
+            HSV.Update();
             Detect.Update();
         }
         public void SetProperty<T>(ref T field, T value, [CallerMemberName] string name = null)
@@ -139,9 +157,58 @@ namespace OpenCV
                 Source.Redo();
                 SourceImage = Source.Get();
             }, v => Source.CanRedo);
+            ToMask = new DefaultCommand(v =>
+            {
+                MaskImage = Source.Get();
+            }, v => Source != null);
             Gray = new DefaultCommand(v =>
             {
                 Mat dst = CvGray(Source.Mat());
+                if (dst != null)
+                {
+                    Source.Push(dst);
+                    SourceImage = Source.Get();
+                }
+            }, v => SourceImage != null);
+            GrayReverse = new DefaultCommand(v =>
+            {
+                Mat dst = CvGrayReverse(Source.Mat());
+                if (dst != null)
+                {
+                    Source.Push(dst);
+                    SourceImage = Source.Get();
+                }
+            }, v => SourceImage != null);
+            Binary = new DefaultCommand(v =>
+            {
+                Mat dst = CvBinary(Source.Mat());
+                if (dst != null)
+                {
+                    Source.Push(dst);
+                    SourceImage = Source.Get();
+                }
+            }, v => SourceImage != null);
+            MedianBlur = new DefaultCommand(v =>
+            {
+                Mat dst = CvMedianBlur(Source.Mat());
+                if (dst != null)
+                {
+                    Source.Push(dst);
+                    SourceImage = Source.Get();
+                }
+            }, v => SourceImage != null);
+            Contour = new DefaultCommand(v =>
+            {
+                Mat dst = CvContour(Source.Mat());
+                if (dst != null)
+                {
+                    Source.Push(dst);
+                    SourceImage = Source.Get();
+                }
+            }, v => SourceImage != null);
+            HSV = new DefaultCommand(v =>
+            {
+                Mat dst = CvHSV(Source.Mat());
                 if (dst != null)
                 {
                     Source.Push(dst);
@@ -164,8 +231,14 @@ namespace OpenCV
         public DefaultCommand OpenSource { get; }
         public DefaultCommand UndoSource { get; }
         public DefaultCommand RedoSource { get; }
+        public DefaultCommand ToMask { get; }
 
         public DefaultCommand Gray { get; }
+        public DefaultCommand GrayReverse { get; }
+        public DefaultCommand Binary { get; }
+        public DefaultCommand MedianBlur { get; }
+        public DefaultCommand Contour { get; }
+        public DefaultCommand HSV { get; }
         public DefaultCommand Detect { get; }
 
         public ObservableCollection<int> SourceOctave { get; } = new ObservableCollection<int>();
@@ -194,6 +267,13 @@ namespace OpenCV
             set => SetProperty(ref _sourceImage, value);
         }
         private BitmapSource _sourceImage;
+
+        public BitmapSource MaskImage
+        {
+            get => _maskImage;
+            set => SetProperty(ref _maskImage, value);
+        }
+        private BitmapSource _maskImage;
 
         public System.Windows.Rect? SearchRect
         {
@@ -231,6 +311,82 @@ namespace OpenCV
             AKAZE akaze = AKAZE.Create();
             //特徴量の検出
             return akaze.Detect(src, null);
+        }
+
+        public Mat CvHSV(Mat src)
+        {
+            Mat dst = new Mat();
+            try
+            {
+                Cv2.CvtColor(src, dst, ColorConversionCodes.RGB2HSV);
+            }
+            catch
+            {
+                dst.Dispose();
+                dst = null;
+            }
+            return dst;
+        }
+
+        public Mat CvBinary(Mat src)
+        {
+            Mat dst = new Mat();
+            try
+            {
+                Cv2.InRange(src, new Scalar(0, 0, 0), new Scalar(255, 200, 255), dst);
+            }
+            catch
+            {
+                dst.Dispose();
+                dst = null;
+            }
+            return dst;
+        }
+
+        public Mat CvMedianBlur(Mat src)
+        {
+            Mat dst = new Mat();
+            try
+            {
+                Cv2.MedianBlur(src, dst, 5);
+            }
+            catch
+            {
+                dst.Dispose();
+                dst = null;
+            }
+            return dst;
+        }
+
+        public Mat CvContour(Mat src)
+        {
+            Mat dst = new Mat();
+            try
+            {
+                Cv2.FindContours(src, out OpenCvSharp.Point[][] contours, out HierarchyIndex[] hierarchy,
+                    RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+            }
+            catch
+            {
+                dst.Dispose();
+                dst = null;
+            }
+            return dst;
+        }
+
+        public Mat CvGrayReverse(Mat src)
+        {
+            Mat dst = new Mat();
+            try
+            {
+                dst = 255 - src;
+            }
+            catch
+            {
+                dst.Dispose();
+                dst = null;
+            }
+            return dst;
         }
     }
 }

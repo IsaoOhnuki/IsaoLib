@@ -103,7 +103,7 @@ namespace OpenCV
                 //CvMatch(SourceImage, TargetImage);
                 TemplateMatchModes matchMode =
                     (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                CvMatch(SourceImage, TargetImage, Threshold, matchMode, out OpenCvSharp.Rect[] matches);
+                CvMatch(SourceImage, TargetImage, SourceMatView.Mask(), Threshold, matchMode, out OpenCvSharp.Rect[] matches);
                 TargetMatView.SearchElements = matches.
                     Select(x => new System.Windows.Point[]
                     {
@@ -250,7 +250,7 @@ namespace OpenCV
         //https://moitkfm.blogspot.com/2014/06/blog-post_10.html
         //https://pfpfdev.hatenablog.com/entry/20200716/1594909766
         //https://qiita.com/sitar-harmonics/items/41d54dbfc6c81b87b905
-        public void CvMatch(Mat tmpMat, Mat refMat, double threshold, TemplateMatchModes matchMode, out OpenCvSharp.Rect[] matches)
+        public void CvMatch(Mat tmpMat, Mat refMat, Mat mask, double threshold, TemplateMatchModes matchMode, out OpenCvSharp.Rect[] matches)
         {
             using (Mat res = new Mat(refMat.Rows - tmpMat.Rows + 1, refMat.Cols - tmpMat.Cols + 1, MatType.CV_32FC1))
             //Convert input images to gray
@@ -258,7 +258,7 @@ namespace OpenCV
                 ? refMat.CvtColor(ColorConversionCodes.BGR2GRAY) : refMat.Clone())
             using (Mat grayTmp = tmpMat.Type().Channels > 1 ? tmpMat.CvtColor(ColorConversionCodes.BGR2GRAY) : tmpMat.Clone())
             {
-                Cv2.MatchTemplate(grayRef, grayTmp, res, matchMode);
+                Cv2.MatchTemplate(grayRef, grayTmp, res, matchMode, mask);
                 Cv2.Threshold(res, res, threshold, 1.0, ThresholdTypes.Tozero);
 
                 List<OpenCvSharp.Rect> rects = new List<OpenCvSharp.Rect>();

@@ -24,6 +24,9 @@
                     Command="{Binding Gray}"
                     CommandParameter="False"
                     Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+                <Button Content="HSV"
+                    Command="{Binding HSV}"
+                    CommandParameter="False"/>
                 <Button Content="Detect"
                     Command="{Binding Detect}"
                     CommandParameter="False"/>
@@ -37,6 +40,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0">
             <Button Content="Source"
@@ -48,10 +52,36 @@
                     Content="&#xE7A6;"
                     Command="{Binding RedoSource}"/>
             <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE896;"
+                    Command="{Binding ToMask}"/>
+            <!--<Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE898;"
+                    Command="{Binding RedoSource}"/>-->
+            <Button FontFamily="Segoe MDL2 Assets"
                     Content="&#xE73B;"
                     Command="{Binding Gray}"
                     CommandParameter="False"
                     Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE746;"
+                    Command="{Binding GrayReverse}"
+                    CommandParameter="False"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE73B;"
+                    Command="{Binding Binary}"
+                    CommandParameter="False"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE739;"
+                    Command="{Binding MedianBlur}"
+                    CommandParameter="False"
+                    Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xE739;"
+                    Command="{Binding Contour}"
+                    CommandParameter="False"/>
+            <Button Content="HSV"
+                    Command="{Binding HSV}"
+                    CommandParameter="False"/>
             <Button Content="Detect"
                     Command="{Binding Detect}"
                     CommandParameter="False"/>
@@ -64,8 +94,8 @@
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
             <Grid HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
+                  VerticalAlignment="Top"
+                  Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
                 <Image Source="{Binding SourceImage}"
                        Stretch="None"/>
                 <Canvas Visibility="{Binding SearchResult, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -86,6 +116,14 @@
                                    ItemsSource="{Binding SourcePoints}"
                                    Visibility="{Binding SourceResult, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </Grid>
+        </ScrollViewer>
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Image HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Source="{Binding MaskImage}"
+                   Stretch="None"/>
         </ScrollViewer>
     </Grid>
 </UserControl>
