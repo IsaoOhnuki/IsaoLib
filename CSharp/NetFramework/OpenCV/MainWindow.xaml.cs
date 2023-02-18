@@ -113,6 +113,21 @@ namespace OpenCV
                         new System.Windows.Point(x.Left, x.Bottom),
                     }).ToArray();
             });
+            StepMatch = new DefaultCommand(v =>
+            {
+                TemplateMatchModes matchMode =
+                    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                Mat result = CvStepMatch(SourceImage, TargetImage, SourceMatView.Mask(), Threshold, matchMode, out OpenCvSharp.Rect[] matches);
+                TargetMatView.Set(result);
+                TargetMatView.SearchElements = matches.
+                    Select(x => new System.Windows.Point[]
+                    {
+                        new System.Windows.Point(x.Left, x.Top),
+                        new System.Windows.Point(x.Right, x.Top),
+                        new System.Windows.Point(x.Right, x.Bottom),
+                        new System.Windows.Point(x.Left, x.Bottom),
+                    }).ToArray();
+            });
 
             Enum.GetNames(typeof(TemplateMatchModes)).ToList().
                 ForEach(name => TemplateMatchModeList.Add(name));
@@ -126,6 +141,7 @@ namespace OpenCV
         public DefaultCommand SearchClear { get; }
 
         public DefaultCommand Match { get; }
+        public DefaultCommand StepMatch { get; }
 
         public ObservableCollection<string> TemplateMatchModeList { get; } = new ObservableCollection<string>();
 
@@ -285,6 +301,41 @@ namespace OpenCV
                 }
 
                 matches = rects.ToArray();
+            }
+        }
+
+        public Mat CvStepMatch(Mat tmpMat, Mat refMat, Mat mask, double threshold, TemplateMatchModes matchMode, out OpenCvSharp.Rect[] matches)
+        {
+            using (Mat res = new Mat(refMat.Rows - tmpMat.Rows + 1, refMat.Cols - tmpMat.Cols + 1, MatType.CV_32FC1))
+            //Convert input images to gray
+            using (Mat grayRef = refMat.Type().Channels > 1
+                ? refMat.CvtColor(ColorConversionCodes.BGR2GRAY) : refMat.Clone())
+            using (Mat grayTmp = tmpMat.Type().Channels > 1 ? tmpMat.CvtColor(ColorConversionCodes.BGR2GRAY) : tmpMat.Clone())
+            {
+                Mat result = grayRef.Clone();
+                Cv2.MatchTemplate(grayRef, grayTmp, res, matchMode, mask);
+                Cv2.Threshold(res, res, threshold, 1.0, ThresholdTypes.Tozero);
+
+                List<OpenCvSharp.Rect> rects = new List<OpenCvSharp.Rect>();
+
+                double minval, maxval;
+                OpenCvSharp.Point minloc, maxloc;
+                Cv2.MinMaxLoc(res, out minval, out maxval, out minloc, out maxloc);
+
+                if (maxval >= threshold)
+                {
+                    //Setup the rectangle to draw
+                    OpenCvSharp.Rect rect = new OpenCvSharp.Rect(
+                        new OpenCvSharp.Point(maxloc.X, maxloc.Y),
+                        new OpenCvSharp.Size(tmpMat.Width, tmpMat.Height));
+                    rects.Add(rect);
+
+                    //Fill in the res Mat so you don't find the same area again in the MinMaxLoc
+                    Cv2.FloodFill(result, maxloc, new Scalar(0), out OpenCvSharp.Rect _, new Scalar(0.1), new Scalar(1.0), FloodFillFlags.Link4);
+                }
+
+                matches = rects.ToArray();
+                return result;
             }
         }
     }

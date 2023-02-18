@@ -39,6 +39,8 @@
             <Separator/>
             <Button Content="Match"
                     Command="{Binding Match}"/>
+            <Button Content="StepMatch"
+                    Command="{Binding StepMatch}"/>
         </ToolBar>
         <Grid Grid.Row="1">
             <Grid.Resources>
