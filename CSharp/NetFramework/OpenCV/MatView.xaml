@@ -79,6 +79,14 @@
                     Content="&#xE739;"
                     Command="{Binding Contour}"
                     CommandParameter="False"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xECC8;"
+                    Command="{Binding Dilate}"
+                    CommandParameter="False"/>
+            <Button FontFamily="Segoe MDL2 Assets"
+                    Content="&#xECC9;"
+                    Command="{Binding Erode}"
+                    CommandParameter="False"/>
             <Button Content="HSV"
                     Command="{Binding HSV}"
                     CommandParameter="False"/>

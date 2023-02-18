@@ -119,6 +119,9 @@ namespace OpenCV
             Gray.Update();
             GrayReverse.Update();
             Binary.Update();
+            Contour.Update();
+            Dilate.Update();
+            Erode.Update();
             MedianBlur.Update();
             HSV.Update();
             Detect.Update();
@@ -206,6 +209,24 @@ namespace OpenCV
                     SourceImage = Source.Get();
                 }
             }, v => SourceImage != null);
+            Dilate = new DefaultCommand(v =>
+            {
+                Mat dst = CvDilate(Source.Mat());
+                if (dst != null)
+                {
+                    Source.Push(dst);
+                    SourceImage = Source.Get();
+                }
+            }, v => SourceImage != null);
+            Erode = new DefaultCommand(v =>
+            {
+                Mat dst = CvErode(Source.Mat());
+                if (dst != null)
+                {
+                    Source.Push(dst);
+                    SourceImage = Source.Get();
+                }
+            }, v => SourceImage != null);
             HSV = new DefaultCommand(v =>
             {
                 Mat dst = CvHSV(Source.Mat());
@@ -238,6 +259,8 @@ namespace OpenCV
         public DefaultCommand Binary { get; }
         public DefaultCommand MedianBlur { get; }
         public DefaultCommand Contour { get; }
+        public DefaultCommand Dilate { get; }
+        public DefaultCommand Erode { get; }
         public DefaultCommand HSV { get; }
         public DefaultCommand Detect { get; }
 
@@ -380,6 +403,42 @@ namespace OpenCV
             try
             {
                 dst = 255 - src;
+            }
+            catch
+            {
+                dst.Dispose();
+                dst = null;
+            }
+            return dst;
+        }
+
+        public Mat CvErode(Mat src)
+        {
+            Mat dst = new Mat();
+            try
+            {
+                using (Mat noise = new Mat(new OpenCvSharp.Size(3, 3), MatType.CV_8UC1))
+                {
+                    Cv2.Erode(src, dst, noise);
+                }
+            }
+            catch
+            {
+                dst.Dispose();
+                dst = null;
+            }
+            return dst;
+        }
+
+        public Mat CvDilate(Mat src)
+        {
+            Mat dst = new Mat();
+            try
+            {
+                using (Mat noise = new Mat(new OpenCvSharp.Size(3, 3), MatType.CV_8UC1))
+                {
+                    Cv2.Dilate(src, dst, noise);
+                }
             }
             catch
             {
