@@ -105,6 +105,30 @@ namespace OpenCV
                 typeof(MatView),
                 new FrameworkPropertyMetadata(false,
                     FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        public KeyPoint[] MatchElements
+        {
+            get => matchPanel.ItemsSource;
+            set
+            {
+                matchPanel.ItemsSource = value;
+                MatchResult = matchPanel.ItemsSource != null;
+            }
+        }
+
+        public bool MatchResult
+        {
+            get { return (bool)GetValue(MatchResultProperty); }
+            set { SetValue(MatchResultProperty, value); }
+        }
+
+        public static readonly DependencyProperty MatchResultProperty =
+            DependencyProperty.Register(
+                nameof(MatchResult),
+                typeof(bool),
+                typeof(MatView),
+                new FrameworkPropertyMetadata(false,
+                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
     }
 
     public class MatViewModel : INotifyPropertyChanged

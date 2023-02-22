@@ -96,6 +96,12 @@
             <ComboBox Width="50"
                       ItemsSource="{Binding SourceOctave}"
                       SelectedValue="{Binding SelectedSourceOctave}"/>
+            <ToggleButton FontFamily="Segoe MDL2 Assets"
+                          Content="&#xE82F;"
+                          IsChecked="{Binding SearchResult, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+            <ToggleButton FontFamily="Segoe MDL2 Assets"
+                          Content="&#xE82F;"
+                          IsChecked="{Binding MatchResult, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
         </ToolBar>
         <ScrollViewer Grid.Row="1"
                       HorizontalScrollBarVisibility="Auto"
@@ -120,9 +126,16 @@
                                    Visibility="{Binding SearchResult,
                                                         RelativeSource={RelativeSource AncestorType={x:Type UserControl}},
                                                         Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                <local:DetectPanel Octave="{Binding SelectedSourceOctave}"
+                <local:DetectPanel x:Name="detectPanel"
+                                   Octave="{Binding SelectedSourceOctave}"
                                    ItemsSource="{Binding SourcePoints}"
-                                   Visibility="{Binding SourceResult, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                   Visibility="{Binding SourceResult,
+                                                        Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <local:MatchPanel x:Name="matchPanel"
+                                  Background="#7FFFFFFF"
+                                  Visibility="{Binding MatchResult,
+                                                       RelativeSource={RelativeSource AncestorType={x:Type UserControl}},
+                                                       Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </Grid>
         </ScrollViewer>
         <ScrollViewer Grid.Row="2"

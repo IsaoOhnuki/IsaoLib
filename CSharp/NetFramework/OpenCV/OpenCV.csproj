@@ -83,6 +83,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MatchPanel.xaml.cs">
+      <DependentUpon>MatchPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MatStack.cs" />
     <Compile Include="DetectPanel.xaml.cs">
       <DependentUpon>DetectPanel.xaml</DependentUpon>
@@ -112,6 +115,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="DetectPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MatchPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

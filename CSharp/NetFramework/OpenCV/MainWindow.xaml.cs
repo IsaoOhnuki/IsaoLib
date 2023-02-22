@@ -105,16 +105,15 @@ namespace OpenCV
                 //CvMatch(SourceImage, TargetImage);
                 TemplateMatchModes matchMode =
                     (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                if (CvMatch(SourceImage, TargetImage, null, out (int, int, double) ret))
+                if (CvMatch(SourceImage, TargetImage, null, out (int, int, float) ret))
                 {
-                    TargetMatView.SearchElements = new System.Windows.Point[][]
+                    TargetMatView.MatchElements = new KeyPoint[]
                     {
-                        new System.Windows.Point[]
+                        new KeyPoint
                         {
-                            new System.Windows.Point(ret.Item1 - 10, ret.Item2 - 10),
-                            new System.Windows.Point(ret.Item1 + 10, ret.Item2 - 10),
-                            new System.Windows.Point(ret.Item1 + 10, ret.Item2 + 10),
-                            new System.Windows.Point(ret.Item1 - 10, ret.Item2 + 10),
+                            Pt = new Point2f(ret.Item1, ret.Item2),
+                            Size = 10,
+                            Angle = ret.Item3,
                         },
                     };
                 }
@@ -355,7 +354,7 @@ namespace OpenCV
         }
 
         // https://qiita.com/grouse324/items/74988134a9073568b32d
-        public bool CvMatch(Mat tmpMat, Mat refMat, Mat mask, out (int X, int Y, double Angle) ret)
+        public bool CvMatch(Mat tmpMat, Mat refMat, Mat mask, out (int X, int Y, float Angle) ret)
         {
             ret = (0, 0, 0);
             using (Mat srcDescriptor = new Mat())
@@ -645,7 +644,7 @@ namespace OpenCV
                 //# 最終結果
                 //print('*****detection scceeded!*****')
                 //print("final output score-> x: {}, y: {}, drc: {}".format(x_current, y_current, drc_current))
-                ret = (x_current, y_current, drc_current);
+                ret = (x_current, y_current, (float)drc_current);
                 return true;
             }
         }
