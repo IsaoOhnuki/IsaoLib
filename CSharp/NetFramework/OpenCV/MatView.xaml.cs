@@ -46,6 +46,26 @@ namespace OpenCV
 
         public Mat MatMask => ((MatViewModel)DataContext).MatMask;
 
+        public void CvTemplateMatching(Mat tmpMat, Mat mask, double threshold, TemplateMatchModes matchMode)
+        {
+            if (DataContext is MatViewModel model)
+            {
+                if (model.CvTemplateMatching(model.Source.Mat(), tmpMat, threshold, matchMode, out System.Windows.Rect matches))
+                {
+                    model.SearchElements = new System.Windows.Point[][]
+                    {
+                        new System.Windows.Point[]
+                        {
+                            new System.Windows.Point(matches.Left, matches.Top),
+                            new System.Windows.Point(matches.Right, matches.Top),
+                            new System.Windows.Point(matches.Right, matches.Bottom),
+                            new System.Windows.Point(matches.Left, matches.Bottom),
+                        }
+                    };
+                }
+            }
+        }
+
         public void CvMatch(Mat tmpMat, Mat mask)
         {
             if (DataContext is MatViewModel model)
@@ -62,15 +82,6 @@ namespace OpenCV
                         },
                     };
                 }
-                //CvMatch(SourceImage, TargetImage, SourceMatView.Mask(), Threshold, matchMode, out OpenCvSharp.Rect[] matches);
-                //TargetMatView.SearchElements = matches.
-                //    Select(x => new System.Windows.Point[]
-                //    {
-                //        new System.Windows.Point(x.Left, x.Top),
-                //        new System.Windows.Point(x.Right, x.Top),
-                //        new System.Windows.Point(x.Right, x.Bottom),
-                //        new System.Windows.Point(x.Left, x.Bottom),
-                //    }).ToArray();
             }
         }
     }
@@ -98,12 +109,12 @@ namespace OpenCV
             RedoSource.Update();
             ToMask.Update();
             Gray.Update();
-            GrayReverse.Update();
+            BinaryReverse.Update();
             Binary.Update();
+            MedianBlur.Update();
             Contour.Update();
             Dilate.Update();
             Erode.Update();
-            MedianBlur.Update();
             HSV.Update();
             Detect.Update();
         }
@@ -144,7 +155,7 @@ namespace OpenCV
             ToMask = new DefaultCommand(v =>
             {
                 MaskImage = Source.Get();
-            }, v => Source != null);
+            }, v => SourceImage != null);
             Gray = new DefaultCommand(v =>
             {
                 Mat dst = CvGray(Source.Mat());
@@ -154,7 +165,7 @@ namespace OpenCV
                     SourceImage = Source.Get();
                 }
             }, v => SourceImage != null);
-            GrayReverse = new DefaultCommand(v =>
+            BinaryReverse = new DefaultCommand(v =>
             {
                 Mat dst = CvGrayReverse(Source.Mat());
                 if (dst != null)
@@ -236,7 +247,7 @@ namespace OpenCV
         public DefaultCommand ToMask { get; }
 
         public DefaultCommand Gray { get; }
-        public DefaultCommand GrayReverse { get; }
+        public DefaultCommand BinaryReverse { get; }
         public DefaultCommand Binary { get; }
         public DefaultCommand MedianBlur { get; }
         public DefaultCommand Contour { get; }
@@ -276,6 +287,17 @@ namespace OpenCV
         }
         private KeyPoint[] _matchElements;
 
+        public System.Windows.Point[][] SearchElements
+        {
+            get => _searchElements;
+            set
+            {
+                SetProperty(ref _searchElements, value);
+                SearchResult = _searchElements != null;
+            }
+        }
+        private System.Windows.Point[][] _searchElements;
+
         public BitmapSource SourceImage
         {
             get => _sourceImage;
@@ -300,18 +322,7 @@ namespace OpenCV
             }
         }
 
-        public Mat MatMask => BitmapSourceConverter.ToMat(MaskImage);
-
-        public System.Windows.Rect? SearchRect
-        {
-            get => _searchRect;
-            set
-            {
-                SetProperty(ref _searchRect, value);
-                SearchResult = _searchRect.HasValue;
-            }
-        }
-        private System.Windows.Rect? _searchRect;
+        public Mat MatMask => MaskImage == null ? null : BitmapSourceConverter.ToMat(MaskImage);
 
         public bool DetectResult
         {
@@ -467,6 +478,56 @@ namespace OpenCV
                 dst = null;
             }
             return dst;
+        }
+
+        public bool CvTemplateMatching(Mat targetImage, Mat tempImage, double threshold,
+            TemplateMatchModes matchMode, out System.Windows.Rect res_rectangle)
+        {
+            res_rectangle = new System.Windows.Rect();
+
+            //Convert input images to gray
+            using (Mat grayRef = targetImage.Type().Channels > 1 ?
+                targetImage.CvtColor(ColorConversionCodes.BGR2GRAY) : targetImage.Clone())
+            using (Mat grayTmp = tempImage.Type().Channels > 1 ?
+                tempImage.CvtColor(ColorConversionCodes.BGR2GRAY) : tempImage.Clone())
+            using (Mat result = new Mat())
+            {
+                try
+                {
+                    //画像認識
+                    Cv2.MatchTemplate(grayRef, grayTmp, result, matchMode);
+                }
+                catch
+                {
+                    return false;
+                }
+
+                // 類似度が最大/最小となる画素の位置を調べる
+                Cv2.MinMaxLoc(result, out double minval, out double maxval, out OpenCvSharp.Point minloc, out OpenCvSharp.Point maxloc);
+
+                // しきい値で判断
+                if (maxval >= threshold)
+                {
+                    //閾値を超えたものを取得
+
+                    OpenCvSharp.Point topLeft;
+                    if (matchMode == TemplateMatchModes.SqDiff || matchMode == TemplateMatchModes.SqDiffNormed)
+                    {
+                        topLeft = minloc;
+                    }
+                    else
+                    {
+                        topLeft = maxloc;
+                    }
+                    res_rectangle.X = topLeft.X;
+                    res_rectangle.Y = topLeft.Y;
+                    res_rectangle.Width = grayTmp.Width;
+                    res_rectangle.Height = grayTmp.Height;
+
+                    return true;
+                }
+            }
+            return false;
         }
 
         // https://qiita.com/grouse324/items/74988134a9073568b32d

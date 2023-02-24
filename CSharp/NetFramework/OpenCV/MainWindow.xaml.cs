@@ -78,6 +78,9 @@ namespace OpenCV
             //}, v => TargetMatView.SearchElements != null);
             Search = new DefaultCommand(v =>
             {
+                TemplateMatchModes matchMode =
+                    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                TargetMatView.CvTemplateMatching(SourceMatView.MatImage, SourceMatView.MatMask, Threshold, matchMode);
                 //TemplateMatchModes matchMode =
                 //    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
                 //if (CvTemplateMatching(TargetImage, SourceImage, Threshold, matchMode, out System.Windows.Rect match))
@@ -98,7 +101,7 @@ namespace OpenCV
                 //    TargetMatView.SearchElements = null;
                 //}
                 //SearchClear.Update();
-            }, v => SourceImage != null && TargetImage != null);
+            });
 
             Match = new DefaultCommand(v =>
             {

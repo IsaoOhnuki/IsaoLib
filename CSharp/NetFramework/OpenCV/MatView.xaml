@@ -8,113 +8,161 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <local:NullableToBoolianConverter x:Key="NullableToBoolianConverter"/>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <local:NullableToBoolianConverter x:Key="NullableToBoolianConverter"/>
 
-        <ControlTemplate x:Key="MatViewToolBar" TargetType="ToolBar">
-            <ToolBar>
-                <Button Content="Source"
-                    Command="{Binding OpenSource}"/>
-                <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE7A7;"
-                    Command="{Binding UndoSource}"/>
-                <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE7A6;"
-                    Command="{Binding RedoSource}"/>
-                <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE73B;"
-                    Command="{Binding Gray}"
-                    CommandParameter="False"
-                    Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
-                <Button Content="HSV"
-                    Command="{Binding HSV}"
-                    CommandParameter="False"/>
-                <Button Content="Detect"
-                    Command="{Binding Detect}"
-                    CommandParameter="False"/>
-                <ComboBox Width="50"
-                      ItemsSource="{Binding SourceOctave}"
-                      SelectedItem="{Binding SelectedSourceOctave}"/>
-            </ToolBar>
-        </ControlTemplate>
+            <ControlTemplate x:Key="MatViewToolBar" TargetType="ToolBar">
+                <ToolBar>
+                    <Button Content="Source"
+                        Command="{Binding OpenSource}"/>
+                    <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE7A7;"
+                        Command="{Binding UndoSource}"/>
+                    <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE7A6;"
+                        Command="{Binding RedoSource}"/>
+                    <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE73B;"
+                        Command="{Binding Gray}"
+                        CommandParameter="False"
+                        Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+                    <Button Content="HSV"
+                        Command="{Binding HSV}"
+                        CommandParameter="False"/>
+                    <Button Content="Detect"
+                        Command="{Binding Detect}"
+                        CommandParameter="False"/>
+                    <ComboBox Width="50"
+                          ItemsSource="{Binding SourceOctave}"
+                          SelectedItem="{Binding SelectedSourceOctave}"/>
+                </ToolBar>
+            </ControlTemplate>
+
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/SharedLib;component/Themes/StyleDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ToolBar Grid.Row="0">
-            <Button Content="Source"
-                    Command="{Binding OpenSource}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE7A7;"
-                    Command="{Binding UndoSource}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE7A6;"
-                    Command="{Binding RedoSource}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE896;"
-                    Command="{Binding ToMask}"/>
-            <!--<Button FontFamily="Segoe MDL2 Assets"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ToolBarTray Grid.Column="0"
+                     Grid.Row="0"
+                     Grid.RowSpan="2"
+                     Orientation="Vertical">
+            <ToolBar>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xED25;"
+                        Command="{Binding OpenSource}"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE7A7;"
+                        Command="{Binding UndoSource}"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE7A6;"
+                        Command="{Binding RedoSource}"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE896;"
+                        ToolTip="Mask"
+                        Command="{Binding ToMask}"/>
+                <Separator/>
+                <!--<Button FontFamily="Segoe MDL2 Assets"
                     Content="&#xE898;"
                     Command="{Binding RedoSource}"/>-->
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE73B;"
-                    Command="{Binding Gray}"
-                    CommandParameter="False"
-                    Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE746;"
-                    Command="{Binding GrayReverse}"
-                    CommandParameter="False"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE73B;"
-                    Command="{Binding Binary}"
-                    CommandParameter="False"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE739;"
-                    Command="{Binding MedianBlur}"
-                    CommandParameter="False"
-                    Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xE739;"
-                    Command="{Binding Contour}"
-                    CommandParameter="False"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xECC8;"
-                    Command="{Binding Dilate}"
-                    CommandParameter="False"/>
-            <Button FontFamily="Segoe MDL2 Assets"
-                    Content="&#xECC9;"
-                    Command="{Binding Erode}"
-                    CommandParameter="False"/>
-            <Button Content="HSV"
-                    Command="{Binding HSV}"
-                    CommandParameter="False"/>
-            <Button Content="Detect"
-                    Command="{Binding Detect}"
-                    CommandParameter="False"/>
-            <ComboBox Width="50"
-                      ItemsSource="{Binding DetectOctave}"
-                      SelectedValue="{Binding SelectedDetectOctave}"/>
-            <ToggleButton FontFamily="Segoe MDL2 Assets"
-                          Content="&#xE82F;"
-                          IsEnabled="{Binding DetectPoints,
-                                              Converter={StaticResource NullableToBoolianConverter}}"
-                          IsChecked="{Binding DetectResult}"/>
-            <ToggleButton FontFamily="Segoe MDL2 Assets"
-                          Content="&#xE82F;"
-                          IsEnabled="{Binding SearchRect,
-                                              Converter={StaticResource NullableToBoolianConverter}}"
-                          IsChecked="{Binding SearchResult}"/>
-            <ToggleButton FontFamily="Segoe MDL2 Assets"
-                          Content="&#xE82F;"
-                          IsEnabled="{Binding MatchElements,
-                                              Converter={StaticResource NullableToBoolianConverter}}"
-                          IsChecked="{Binding MatchResult}"/>
-        </ToolBar>
-        <ScrollViewer Grid.Row="1"
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE73B;"
+                        ToolTip="Gray"
+                        Command="{Binding Gray}"
+                        CommandParameter="False"
+                        Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE73B;"
+                        ToolTip="Binary"
+                        Command="{Binding Binary}"
+                        CommandParameter="False"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE746;"
+                        ToolTip="BinaryReverse"
+                        Command="{Binding BinaryReverse}"
+                        CommandParameter="False"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE739;"
+                        ToolTip="MedianBlur"
+                        Command="{Binding MedianBlur}"
+                        CommandParameter="False"
+                        Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xE739;"
+                        ToolTip="Contour"
+                        Command="{Binding Contour}"
+                        CommandParameter="False"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xECC8;"
+                        ToolTip="Dilate"
+                        Command="{Binding Dilate}"
+                        CommandParameter="False"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xECC9;"
+                        ToolTip="Erode"
+                        Command="{Binding Erode}"
+                        CommandParameter="False"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xF354;"
+                        ToolTip="HSV"
+                        Command="{Binding HSV}"
+                        CommandParameter="False"/>
+                <Button FontFamily="Segoe MDL2 Assets"
+                        Content="&#xECAD;"
+                        ToolTip="Detect"
+                        Command="{Binding Detect}"
+                        CommandParameter="False"/>
+                <ComboBox Style="{DynamicResource FlyoutStyle}"
+                          ToolTip="Octave"
+                          IsEnabled="{Binding DetectResult}"
+                          ItemsSource="{Binding DetectOctave}"
+                          SelectedValue="{Binding SelectedDetectOctave}">
+                    <ComboBox.Tag>
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xE7B7;"
+                                   IsEnabled="{Binding DetectResult}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </ComboBox.Tag>
+                </ComboBox>
+                <Separator/>
+                <ToggleButton FontFamily="Segoe MDL2 Assets"
+                              Content="&#xE82F;"
+                              IsEnabled="{Binding DetectPoints,
+                                                  Converter={StaticResource NullableToBoolianConverter}}"
+                              IsChecked="{Binding DetectResult}"/>
+                <ToggleButton FontFamily="Segoe MDL2 Assets"
+                              Content="&#xE82F;"
+                              IsEnabled="{Binding SearchRect,
+                                                  Converter={StaticResource NullableToBoolianConverter}}"
+                              IsChecked="{Binding SearchResult}"/>
+                <ToggleButton FontFamily="Segoe MDL2 Assets"
+                              Content="&#xE82F;"
+                              IsEnabled="{Binding MatchElements,
+                                                  Converter={StaticResource NullableToBoolianConverter}}"
+                              IsChecked="{Binding MatchResult}"/>
+            </ToolBar>
+        </ToolBarTray>
+        <ScrollViewer Grid.Row="0"
+                      Grid.Column="1"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
@@ -135,6 +183,7 @@
                 </Canvas>
                 <local:SearchPanel x:Name="searchPanel"
                                    Background="#7FFFFFFF"
+                                   ItemsSource="{Binding SearchElements}"
                                    Visibility="{Binding SearchResult,
                                                         Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 <local:DetectPanel x:Name="detectPanel"
@@ -150,7 +199,8 @@
                                                        Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </Grid>
         </ScrollViewer>
-        <ScrollViewer Grid.Row="2"
+        <ScrollViewer Grid.Row="1"
+                      Grid.Column="1"
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
             <Image HorizontalAlignment="Left"
