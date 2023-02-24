@@ -9,6 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:NullableToBoolianConverter x:Key="NullableToBoolianConverter"/>
 
         <ControlTemplate x:Key="MatViewToolBar" TargetType="ToolBar">
             <ToolBar>
@@ -99,13 +100,19 @@
                       SelectedValue="{Binding SelectedDetectOctave}"/>
             <ToggleButton FontFamily="Segoe MDL2 Assets"
                           Content="&#xE82F;"
+                          IsEnabled="{Binding DetectPoints,
+                                              Converter={StaticResource NullableToBoolianConverter}}"
                           IsChecked="{Binding DetectResult}"/>
             <ToggleButton FontFamily="Segoe MDL2 Assets"
                           Content="&#xE82F;"
-                          IsChecked="{Binding SearchResult, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                          IsEnabled="{Binding SearchRect,
+                                              Converter={StaticResource NullableToBoolianConverter}}"
+                          IsChecked="{Binding SearchResult}"/>
             <ToggleButton FontFamily="Segoe MDL2 Assets"
                           Content="&#xE82F;"
-                          IsChecked="{Binding MatchResult, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                          IsEnabled="{Binding MatchElements,
+                                              Converter={StaticResource NullableToBoolianConverter}}"
+                          IsChecked="{Binding MatchResult}"/>
         </ToolBar>
         <ScrollViewer Grid.Row="1"
                       HorizontalScrollBarVisibility="Auto"

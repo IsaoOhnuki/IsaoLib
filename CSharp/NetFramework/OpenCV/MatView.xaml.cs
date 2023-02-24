@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -36,80 +37,6 @@ namespace OpenCV
             MatViewModel model = new MatViewModel();
             DataContext = model;
         }
-
-        public Mat Image
-        {
-            get => ((MatViewModel)DataContext).Source.Mat();
-            set => ((MatViewModel)DataContext).Source.Push(value);
-        }
-
-        //public void Set(Mat mat)
-        //{
-        //    if (DataContext is MatViewModel model)
-        //    {
-        //        model.Source.Push(mat);
-        //        model.SourceImage = model.Source.Get();
-        //    }
-        //}
-
-        //public Mat Mask()
-        //{
-        //    Mat result = null;
-        //    if (DataContext is MatViewModel model &&
-        //        model.MaskImage != null)
-        //    {
-        //        result = BitmapSourceConverter.ToMat(model.MaskImage);
-        //    }
-        //    return result;
-        //}
-
-        //public System.Windows.Point[][] SearchElements
-        //{
-        //    get => searchPanel.ItemsSource;
-        //    set
-        //    {
-        //        searchPanel.ItemsSource = value;
-        //        SearchResult = searchPanel.ItemsSource != null;
-        //    }
-        //}
-
-        //public bool SearchResult
-        //{
-        //    get { return (bool)GetValue(SearchResultProperty); }
-        //    set { SetValue(SearchResultProperty, value); }
-        //}
-
-        //public static readonly DependencyProperty SearchResultProperty =
-        //    DependencyProperty.Register(
-        //        nameof(SearchResult),
-        //        typeof(bool),
-        //        typeof(MatView),
-        //        new FrameworkPropertyMetadata(false,
-        //            FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-
-        //public KeyPoint[] MatchElements
-        //{
-        //    get => matchPanel.ItemsSource;
-        //    set
-        //    {
-        //        matchPanel.ItemsSource = value;
-        //        MatchResult = matchPanel.ItemsSource != null;
-        //    }
-        //}
-
-        //public bool MatchResult
-        //{
-        //    get { return (bool)GetValue(MatchResultProperty); }
-        //    set { SetValue(MatchResultProperty, value); }
-        //}
-
-        //public static readonly DependencyProperty MatchResultProperty =
-        //    DependencyProperty.Register(
-        //        nameof(MatchResult),
-        //        typeof(bool),
-        //        typeof(MatView),
-        //        new FrameworkPropertyMetadata(false,
-        //            FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public Mat MatImage
         {
@@ -145,6 +72,19 @@ namespace OpenCV
                 //        new System.Windows.Point(x.Left, x.Bottom),
                 //    }).ToArray();
             }
+        }
+    }
+
+    public class NullableToBoolianConverter : ConverterBase<object, bool>
+    {
+        public override bool Convert(object value, object parameter, CultureInfo culture)
+        {
+            return value != null;
+        }
+
+        public override object ConvertBack(bool value, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -353,7 +293,11 @@ namespace OpenCV
         public Mat MatImage
         {
             get => Source.Mat();
-            set => Source.Push(value);
+            set
+            {
+                Source.Push(value);
+                SourceImage = Source.Get();
+            }
         }
 
         public Mat MatMask => BitmapSourceConverter.ToMat(MaskImage);
