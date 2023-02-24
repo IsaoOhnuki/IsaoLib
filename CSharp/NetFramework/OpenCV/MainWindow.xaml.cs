@@ -54,7 +54,7 @@ namespace OpenCV
             SourceToTarget.Update();
             TargetToSource.Update();
             Search.Update();
-            SearchClear.Update();
+            //SearchClear.Update();
         }
         public void SetProperty<T>(ref T field, T value, [CallerMemberName] string name = null)
         {
@@ -66,57 +66,58 @@ namespace OpenCV
         {
             SourceToTarget = new DefaultCommand(v =>
             {
-                TargetMatView.Set(SourceImage);
+                //TargetMatView.Set(SourceImage);
             }, v => SourceImage != null);
             TargetToSource = new DefaultCommand(v =>
             {
-                SourceMatView.Set(TargetImage);
+                //SourceMatView.Set(TargetImage);
             }, v => TargetImage != null);
-            SearchClear = new DefaultCommand(v =>
-            {
-                TargetMatView.SearchElements = null;
-            }, v => TargetMatView.SearchElements != null);
+            //SearchClear = new DefaultCommand(v =>
+            //{
+            //    TargetMatView.SearchElements = null;
+            //}, v => TargetMatView.SearchElements != null);
             Search = new DefaultCommand(v =>
             {
-                TemplateMatchModes matchMode =
-                    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                if (CvTemplateMatching(TargetImage, SourceImage, Threshold, matchMode, out System.Windows.Rect match))
-                {
-                    TargetMatView.SearchElements = new System.Windows.Point[][]
-                    {
-                        new System.Windows.Point[]
-                        {
-                            new System.Windows.Point(match.Left, match.Top),
-                            new System.Windows.Point(match.Right, match.Top),
-                            new System.Windows.Point(match.Right, match.Bottom),
-                            new System.Windows.Point(match.Left, match.Bottom),
-                        },
-                    };
-                }
-                else
-                {
-                    TargetMatView.SearchElements = null;
-                }
-                SearchClear.Update();
+                //TemplateMatchModes matchMode =
+                //    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                //if (CvTemplateMatching(TargetImage, SourceImage, Threshold, matchMode, out System.Windows.Rect match))
+                //{
+                //    TargetMatView.SearchElements = new System.Windows.Point[][]
+                //    {
+                //        new System.Windows.Point[]
+                //        {
+                //            new System.Windows.Point(match.Left, match.Top),
+                //            new System.Windows.Point(match.Right, match.Top),
+                //            new System.Windows.Point(match.Right, match.Bottom),
+                //            new System.Windows.Point(match.Left, match.Bottom),
+                //        },
+                //    };
+                //}
+                //else
+                //{
+                //    TargetMatView.SearchElements = null;
+                //}
+                //SearchClear.Update();
             }, v => SourceImage != null && TargetImage != null);
 
             Match = new DefaultCommand(v =>
             {
-                //CvMatch(SourceImage, TargetImage);
-                TemplateMatchModes matchMode =
-                    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                if (CvMatch(SourceImage, TargetImage, null, out (int, int, float) ret))
-                {
-                    TargetMatView.MatchElements = new KeyPoint[]
-                    {
-                        new KeyPoint
-                        {
-                            Pt = new Point2f(ret.Item1, ret.Item2),
-                            Size = 10,
-                            Angle = ret.Item3,
-                        },
-                    };
-                }
+                TargetMatView.CvMatch(SourceMatView.MatImage, SourceMatView.MatMask);
+                ////CvMatch(SourceImage, TargetImage);
+                //TemplateMatchModes matchMode =
+                //    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                //if (CvMatch(SourceImage, TargetImage, null, out (int, int, float) ret))
+                //{
+                //    TargetMatView.MatchElements = new KeyPoint[]
+                //    {
+                //        new KeyPoint
+                //        {
+                //            Pt = new Point2f(ret.Item1, ret.Item2),
+                //            Size = 10,
+                //            Angle = ret.Item3,
+                //        },
+                //    };
+                //}
                 //CvMatch(SourceImage, TargetImage, SourceMatView.Mask(), Threshold, matchMode, out OpenCvSharp.Rect[] matches);
                 //TargetMatView.SearchElements = matches.
                 //    Select(x => new System.Windows.Point[]
@@ -129,18 +130,18 @@ namespace OpenCV
             });
             StepMatch = new DefaultCommand(v =>
             {
-                TemplateMatchModes matchMode =
-                    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                Mat result = CvStepMatch(SourceImage, TargetImage, SourceMatView.Mask(), Threshold, matchMode, out OpenCvSharp.Rect[] matches);
-                TargetMatView.Set(result);
-                TargetMatView.SearchElements = matches.
-                    Select(x => new System.Windows.Point[]
-                    {
-                        new System.Windows.Point(x.Left, x.Top),
-                        new System.Windows.Point(x.Right, x.Top),
-                        new System.Windows.Point(x.Right, x.Bottom),
-                        new System.Windows.Point(x.Left, x.Bottom),
-                    }).ToArray();
+                //TemplateMatchModes matchMode =
+                //    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                //Mat result = CvStepMatch(SourceImage, TargetImage, SourceMatView.Mask(), Threshold, matchMode, out OpenCvSharp.Rect[] matches);
+                //TargetMatView.Set(result);
+                //TargetMatView.SearchElements = matches.
+                //    Select(x => new System.Windows.Point[]
+                //    {
+                //        new System.Windows.Point(x.Left, x.Top),
+                //        new System.Windows.Point(x.Right, x.Top),
+                //        new System.Windows.Point(x.Right, x.Bottom),
+                //        new System.Windows.Point(x.Left, x.Bottom),
+                //    }).ToArray();
             });
 
             Enum.GetNames(typeof(TemplateMatchModes)).ToList().

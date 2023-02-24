@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenCV"
+             d:DataContext="{d:DesignInstance Type=local:MatViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -94,8 +95,11 @@
                     Command="{Binding Detect}"
                     CommandParameter="False"/>
             <ComboBox Width="50"
-                      ItemsSource="{Binding SourceOctave}"
-                      SelectedValue="{Binding SelectedSourceOctave}"/>
+                      ItemsSource="{Binding DetectOctave}"
+                      SelectedValue="{Binding SelectedDetectOctave}"/>
+            <ToggleButton FontFamily="Segoe MDL2 Assets"
+                          Content="&#xE82F;"
+                          IsChecked="{Binding DetectResult}"/>
             <ToggleButton FontFamily="Segoe MDL2 Assets"
                           Content="&#xE82F;"
                           IsChecked="{Binding SearchResult, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
@@ -112,29 +116,30 @@
                   Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
                 <Image Source="{Binding SourceImage}"
                        Stretch="None"/>
-                <Canvas Visibility="{Binding SearchResult, Converter={StaticResource BooleanToVisibilityConverter}}"
+                <Canvas Visibility="{Binding SearchResult,
+                                             Converter={StaticResource BooleanToVisibilityConverter}}"
                         Background="#7FFFFFFF">
-                    <Rectangle Canvas.Left="{Binding SearchRect.Left}"
-                               Canvas.Top="{Binding SearchRect.Top}"
-                               Width="{Binding SearchRect.Width}"
-                               Height="{Binding SearchRect.Height}"
+                    <Rectangle Canvas.Left="{Binding SearchRect?.Left}"
+                               Canvas.Top="{Binding SearchRect?.Top}"
+                               Width="{Binding SearchRect?.Width}"
+                               Height="{Binding SearchRect?.Height}"
                                Stroke="Red"
                                StrokeThickness="2"/>
                 </Canvas>
                 <local:SearchPanel x:Name="searchPanel"
                                    Background="#7FFFFFFF"
                                    Visibility="{Binding SearchResult,
-                                                        RelativeSource={RelativeSource AncestorType={x:Type UserControl}},
                                                         Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 <local:DetectPanel x:Name="detectPanel"
-                                   Octave="{Binding SelectedSourceOctave}"
-                                   ItemsSource="{Binding SourcePoints}"
-                                   Visibility="{Binding SourceResult,
+                                   Background="#7FFFFFFF"
+                                   Octave="{Binding SelectedDetectOctave}"
+                                   ItemsSource="{Binding DetectPoints}"
+                                   Visibility="{Binding DetectResult,
                                                         Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 <local:MatchPanel x:Name="matchPanel"
                                   Background="#7FFFFFFF"
+                                  ItemsSource="{Binding MatchElements}"
                                   Visibility="{Binding MatchResult,
-                                                       RelativeSource={RelativeSource AncestorType={x:Type UserControl}},
                                                        Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </Grid>
         </ScrollViewer>

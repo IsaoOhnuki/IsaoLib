@@ -55,11 +55,9 @@
                           HorizontalAlignment="Stretch"
                           Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}"/>
             <local:MatView x:Name="sourceImage"
-                           Grid.Column="0"
-                           Image="{Binding DataContext.SourceImage, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                           Grid.Column="0"/>
             <local:MatView x:Name="targetImage"
-                           Grid.Column="2"
-                           Image="{Binding DataContext.TargetImage, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                           Grid.Column="2"/>
         </Grid>
     </Grid>
 </Window>
