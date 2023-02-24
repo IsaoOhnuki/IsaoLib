@@ -173,6 +173,10 @@
       <Project>{76b0f7d5-26c0-4924-b5fb-56ab8b2f59cf}</Project>
       <Name>MVVM</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SharedLib\SharedLib.csproj">
+      <Project>{D10C6709-3665-4210-8668-08D494895802}</Project>
+      <Name>SharedLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\WIN_20230204_10_18_08_Pro.jpg" />
