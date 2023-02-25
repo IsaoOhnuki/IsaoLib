@@ -17,7 +17,7 @@
     <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
     <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="{x:Static SystemColors.ControlColor}"/>
     <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
-    <SolidColorBrush x:Key="TextBox.Pressed.Background" Color="{x:Static SystemColors.ControlDarkColor}"/>
+    <SolidColorBrush x:Key="TextBox.Pressed.Background" Color="{x:Static SystemColors.ControlLightColor}"/>
     <SolidColorBrush x:Key="TextBox.Pressed.Border" Color="#FF7EB4EA"/>
     <SolidColorBrush x:Key="TextBox.Disabled.Background" Color="White"/>
     <SolidColorBrush x:Key="TextBox.Disabled.Border" Color="Gray"/>
@@ -105,6 +105,7 @@
                                      VerticalContentAlignment="Center"
                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                      Margin="0"
+                                     TextAlignment="Right"
                                      Padding="{TemplateBinding Padding}">
                             </TextBox>
                             <RepeatButton x:Name="PART_UpButton"
@@ -113,7 +114,9 @@
                                           Background="{TemplateBinding Background}"
                                           HorizontalAlignment="Stretch">
                                 <RepeatButton.Content>
-                                    <TextBlock Text="+"
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               Text="&#xE70E;"
+                                               VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                 </RepeatButton.Content>
                             </RepeatButton>
@@ -123,7 +126,9 @@
                                           Background="{TemplateBinding Background}"
                                           HorizontalAlignment="Stretch">
                                 <RepeatButton.Content>
-                                    <TextBlock Text="-"
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               Text="&#xE70D;"
+                                               VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                 </RepeatButton.Content>
                             </RepeatButton>
