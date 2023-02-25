@@ -151,7 +151,7 @@
                               IsChecked="{Binding DetectResult}"/>
                 <ToggleButton FontFamily="Segoe MDL2 Assets"
                               Content="&#xE82F;"
-                              IsEnabled="{Binding SearchRect,
+                              IsEnabled="{Binding SearchElements,
                                                   Converter={StaticResource NullableToBoolianConverter}}"
                               IsChecked="{Binding SearchResult}"/>
                 <ToggleButton FontFamily="Segoe MDL2 Assets"

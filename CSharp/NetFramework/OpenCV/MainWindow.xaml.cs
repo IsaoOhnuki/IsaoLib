@@ -82,13 +82,19 @@ namespace OpenCV
             });
             Search = new DefaultCommand(v =>
             {
-                TemplateMatchModes matchMode =
-                    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                TargetMatView.CvTemplateMatching(SourceMatView.MatImage, SourceMatView.MatMask, Threshold, matchMode);
+                if (SourceImage != null && TargetImage != null)
+                {
+                    TemplateMatchModes matchMode =
+                        (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                    TargetMatView.CvTemplateMatching(SourceMatView.MatImage, SourceMatView.MatMask, Threshold, matchMode);
+                }
             });
             Match = new DefaultCommand(v =>
             {
-                TargetMatView.CvMatch(SourceMatView.MatImage, SourceMatView.MatMask);
+                if (SourceImage != null && TargetImage != null)
+                {
+                    TargetMatView.CvMatch(SourceMatView.MatImage, SourceMatView.MatMask);
+                }
             });
             StepMatch = new DefaultCommand(v =>
             {

@@ -28,7 +28,8 @@
                       Width="100"
                       ItemsSource="{Binding TemplateMatchModeList}"
                       SelectedItem="{Binding SelectedTemplateMatchMode}"/>
-            <Controls:NumericUpDown Value="{Binding Threshold}"
+            <Controls:NumericUpDown Width="60"
+                                    Value="{Binding Threshold}"
                                     MinValue="0.1"
                                     MaxValue="1"
                                     DecimalPlace="1"/>
