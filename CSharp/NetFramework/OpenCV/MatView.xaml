@@ -171,16 +171,6 @@
                   Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
                 <Image Source="{Binding SourceImage}"
                        Stretch="None"/>
-                <Canvas Visibility="{Binding SearchResult,
-                                             Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Background="#7FFFFFFF">
-                    <Rectangle Canvas.Left="{Binding SearchRect?.Left}"
-                               Canvas.Top="{Binding SearchRect?.Top}"
-                               Width="{Binding SearchRect?.Width}"
-                               Height="{Binding SearchRect?.Height}"
-                               Stroke="Red"
-                               StrokeThickness="2"/>
-                </Canvas>
                 <local:SearchPanel x:Name="searchPanel"
                                    Background="#7FFFFFFF"
                                    ItemsSource="{Binding SearchElements}"
