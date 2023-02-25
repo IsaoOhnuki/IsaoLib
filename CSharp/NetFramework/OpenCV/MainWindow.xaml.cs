@@ -70,30 +70,38 @@ namespace OpenCV
             {
                 if (SourceImage != null)
                 {
-                    TargetMatView.MatImage = SourceImage;
+                    TargetMatView.SourceImage = SourceImage;
                 }
             });
             TargetToSource = new DefaultCommand(v =>
             {
                 if (TargetImage != null)
                 {
-                    SourceMatView.MatImage = TargetImage;
+                    SourceMatView.SourceImage = TargetImage;
                 }
             });
             Search = new DefaultCommand(v =>
             {
                 if (SourceImage != null && TargetImage != null)
                 {
-                    TemplateMatchModes matchMode =
-                        (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                    TargetMatView.CvTemplateMatching(SourceMatView.MatImage, SourceMatView.MatMask, Threshold, matchMode);
+                    using (Mat temp = BitmapSourceConverter.ToMat(SourceImage))
+                    using (Mat mask = SourceMask != null ? BitmapSourceConverter.ToMat(SourceMask) : null)
+                    {
+                        TemplateMatchModes matchMode =
+                            (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
+                        TargetMatView.CvTemplateMatching(temp, mask, Threshold, matchMode);
+                    }
                 }
             });
             Match = new DefaultCommand(v =>
             {
                 if (SourceImage != null && TargetImage != null)
                 {
-                    TargetMatView.CvMatch(SourceMatView.MatImage, SourceMatView.MatMask);
+                    using (Mat temp = BitmapSourceConverter.ToMat(SourceImage))
+                    using (Mat mask = SourceMask != null ? BitmapSourceConverter.ToMat(SourceMask) : null)
+                    {
+                        TargetMatView.CvMatch(temp, mask);
+                    }
                 }
             });
             StepMatch = new DefaultCommand(v =>
@@ -130,9 +138,11 @@ namespace OpenCV
         public MatView SourceMatView { get; set; }
         public MatView TargetMatView { get; set; }
 
-        public Mat SourceImage => SourceMatView?.MatImage;
+        public BitmapSource SourceImage => SourceMatView?.SourceImage;
 
-        public Mat TargetImage => TargetMatView?.MatImage;
+        public BitmapSource SourceMask => SourceMatView?.MaskImage;
+
+        public BitmapSource TargetImage => TargetMatView?.SourceImage;
 
         public string SelectedTemplateMatchMode
         {

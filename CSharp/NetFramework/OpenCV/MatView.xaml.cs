@@ -38,13 +38,17 @@ namespace OpenCV
             DataContext = model;
         }
 
-        public Mat MatImage
+        public BitmapSource SourceImage
         {
-            get => ((MatViewModel)DataContext).MatImage;
-            set => ((MatViewModel)DataContext).MatImage = value;
+            get => ((MatViewModel)DataContext).SourceImage;
+            set => ((MatViewModel)DataContext).SourceImage = value;
         }
 
-        public Mat MatMask => ((MatViewModel)DataContext).MatMask;
+        public BitmapSource MaskImage
+        {
+            get => ((MatViewModel)DataContext).MaskImage;
+            set => ((MatViewModel)DataContext).MaskImage = value;
+        }
 
         public void CvTemplateMatching(Mat tmpMat, Mat mask, double threshold, TemplateMatchModes matchMode)
         {
