@@ -34,14 +34,16 @@ namespace OpenCV
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        private ImageSearchViewModel ImageSearchViewModel { get; } = new ImageSearchViewModel();
         public MainWindow()
         {
             InitializeComponent();
 
-            ImageSearchViewModel.SourceMatView = sourceImage;
-            ImageSearchViewModel.TargetMatView = targetImage;
-            DataContext = ImageSearchViewModel;
+            ImageSearchViewModel viewModel = new ImageSearchViewModel()
+            {
+                SourceMatView = sourceImage,
+                TargetMatView = targetImage
+            };
+            DataContext = viewModel;
         }
     }
 
@@ -66,70 +68,27 @@ namespace OpenCV
         {
             SourceToTarget = new DefaultCommand(v =>
             {
-                //TargetMatView.Set(SourceImage);
-            }, v => SourceImage != null);
+                if (SourceImage != null)
+                {
+                    TargetMatView.MatImage = SourceImage;
+                }
+            });
             TargetToSource = new DefaultCommand(v =>
             {
-                //SourceMatView.Set(TargetImage);
-            }, v => TargetImage != null);
-            //SearchClear = new DefaultCommand(v =>
-            //{
-            //    TargetMatView.SearchElements = null;
-            //}, v => TargetMatView.SearchElements != null);
+                if (TargetImage != null)
+                {
+                    SourceMatView.MatImage = TargetImage;
+                }
+            });
             Search = new DefaultCommand(v =>
             {
                 TemplateMatchModes matchMode =
                     (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
                 TargetMatView.CvTemplateMatching(SourceMatView.MatImage, SourceMatView.MatMask, Threshold, matchMode);
-                //TemplateMatchModes matchMode =
-                //    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                //if (CvTemplateMatching(TargetImage, SourceImage, Threshold, matchMode, out System.Windows.Rect match))
-                //{
-                //    TargetMatView.SearchElements = new System.Windows.Point[][]
-                //    {
-                //        new System.Windows.Point[]
-                //        {
-                //            new System.Windows.Point(match.Left, match.Top),
-                //            new System.Windows.Point(match.Right, match.Top),
-                //            new System.Windows.Point(match.Right, match.Bottom),
-                //            new System.Windows.Point(match.Left, match.Bottom),
-                //        },
-                //    };
-                //}
-                //else
-                //{
-                //    TargetMatView.SearchElements = null;
-                //}
-                //SearchClear.Update();
             });
-
             Match = new DefaultCommand(v =>
             {
                 TargetMatView.CvMatch(SourceMatView.MatImage, SourceMatView.MatMask);
-                ////CvMatch(SourceImage, TargetImage);
-                //TemplateMatchModes matchMode =
-                //    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                //if (CvMatch(SourceImage, TargetImage, null, out (int, int, float) ret))
-                //{
-                //    TargetMatView.MatchElements = new KeyPoint[]
-                //    {
-                //        new KeyPoint
-                //        {
-                //            Pt = new Point2f(ret.Item1, ret.Item2),
-                //            Size = 10,
-                //            Angle = ret.Item3,
-                //        },
-                //    };
-                //}
-                //CvMatch(SourceImage, TargetImage, SourceMatView.Mask(), Threshold, matchMode, out OpenCvSharp.Rect[] matches);
-                //TargetMatView.SearchElements = matches.
-                //    Select(x => new System.Windows.Point[]
-                //    {
-                //        new System.Windows.Point(x.Left, x.Top),
-                //        new System.Windows.Point(x.Right, x.Top),
-                //        new System.Windows.Point(x.Right, x.Bottom),
-                //        new System.Windows.Point(x.Left, x.Bottom),
-                //    }).ToArray();
             });
             StepMatch = new DefaultCommand(v =>
             {
@@ -156,7 +115,6 @@ namespace OpenCV
         public DefaultCommand TargetToSource { get; }
 
         public DefaultCommand Search { get; }
-        public DefaultCommand SearchClear { get; }
 
         public DefaultCommand Match { get; }
         public DefaultCommand StepMatch { get; }
@@ -166,19 +124,9 @@ namespace OpenCV
         public MatView SourceMatView { get; set; }
         public MatView TargetMatView { get; set; }
 
-        public Mat SourceImage
-        {
-            get => _sourceImage;
-            set => SetProperty(ref _sourceImage, value);
-        }
-        private Mat _sourceImage;
+        public Mat SourceImage => SourceMatView?.MatImage;
 
-        public Mat TargetImage
-        {
-            get => _targetImage;
-            set => SetProperty(ref _targetImage, value);
-        }
-        private Mat _targetImage;
+        public Mat TargetImage => TargetMatView?.MatImage;
 
         public string SelectedTemplateMatchMode
         {
@@ -186,13 +134,6 @@ namespace OpenCV
             set => SetProperty(ref _selectedTemplateMatchMode, value);
         }
         private string _selectedTemplateMatchMode;
-
-        public bool SearchResult
-        {
-            get => _searchResult;
-            set => SetProperty(ref _searchResult, value);
-        }
-        private bool _searchResult;
 
         public double Threshold
         {

@@ -29,54 +29,47 @@ namespace SharedLib.Controls
             nameof(Value),
             typeof(decimal),
             typeof(NumericUpDown),
-            new PropertyMetadata(default(decimal), ValueChanged));
-
-        private static void ValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((NumericUpDown)d).UpdateState(true);
-        }
+            new FrameworkPropertyMetadata(
+                default(decimal),
+                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                (s, e) =>
+                {
+                    if (s is NumericUpDown ctrl &&
+                        e.NewValue is decimal value)
+                    {
+                        ctrl.TextBox.SetValue(TextBox.TextProperty, value.ToString($"F{ctrl.DecimalPlace}"));
+                    }
+                }));
 
         public decimal Value
         {
             get => decimal.TryParse(TextBox?.Text, out decimal value) ? value : 0;
-            set => TextBox.SetValue(TextBox.TextProperty, value.ToString($"F{DecimalPlace}"));
-        }
-
-        private void UpdateState(bool useTransition)
-        {
-            if (decimal.TryParse(TextBox?.Text, out _))
-            {
-                VisualStateManager.GoToState(this, "Positive", useTransition);
-            }
-            else
-            {
-                VisualStateManager.GoToState(this, "Negative", useTransition);
-            }
+            set => SetValue(ValueProperty, value);
         }
 
         public static readonly DependencyProperty MaxValueProperty =
         DependencyProperty.Register(
             nameof(MaxValue),
-            typeof(decimal),
+            typeof(decimal?),
             typeof(NumericUpDown),
-            new PropertyMetadata((decimal)0));
+            new PropertyMetadata((decimal?)null));
 
-        public decimal MaxValue
+        public decimal? MaxValue
         {
-            get => (decimal)GetValue(MaxValueProperty);
+            get => (decimal?)GetValue(MaxValueProperty);
             set => SetValue(MaxValueProperty, value);
         }
 
         public static readonly DependencyProperty MinValueProperty =
         DependencyProperty.Register(
             nameof(MinValue),
-            typeof(decimal),
+            typeof(decimal?),
             typeof(NumericUpDown),
-            new PropertyMetadata(decimal.MinValue));
+            new PropertyMetadata((decimal?)null));
 
-        public decimal MinValue
+        public decimal? MinValue
         {
-            get => (decimal)GetValue(MinValueProperty);
+            get => (decimal?)GetValue(MinValueProperty);
             set => SetValue(MinValueProperty, value);
         }
 
@@ -85,33 +78,22 @@ namespace SharedLib.Controls
             nameof(DecimalPlace),
             typeof(int),
             typeof(NumericUpDown),
-            new PropertyMetadata(
-                0,
-                (s, e) =>
-                {
-                    if (s is NumericUpDown ctrl)
-                    {
-                        if (e.OldValue is int oldVal)
-                        {
-                            ctrl.StepValue = 1;
-                        }
-                        if (e.NewValue is int newVal)
-                        {
-                            decimal val = 1;
-                            for (int i = 0; i < newVal; i++)
-                            {
-                                val /= 10;
-                            }
-                            ctrl.StepValue = val;
-                        }
-                    }
-                },
-                (s, e) => e is int value && value >= 0 ? value : 0));
+            new PropertyMetadata(0));
 
         public int DecimalPlace
         {
             get => (int)GetValue(DecimalPlaceProperty);
             set => SetValue(DecimalPlaceProperty, value);
+        }
+
+        private decimal StepValue()
+        {
+            decimal val = 1;
+            for (int i = 0; i < DecimalPlace; i++)
+            {
+                val /= 10;
+            }
+            return val;
         }
 
         public TextBox TextBox
@@ -180,29 +162,45 @@ namespace SharedLib.Controls
 
         private void TextBoxTextChanged(object sender, TextChangedEventArgs e)
         {
-            UpdateState(true);
+            if (sender is TextBox textBox &&
+                decimal.TryParse(textBox.Text, out decimal value))
+            {
+                Value = value;
+            }
         }
-
-        private decimal StepValue { get; set; } = 1;
 
         private void UpButtonClick(object sender, RoutedEventArgs e)
         {
-            decimal val = StepValue;
-            if (MaxValue == decimal.MaxValue ||
-                Value <= MaxValue - val)
+            decimal value = Value;
+            decimal step = StepValue();
+            if (!MaxValue.HasValue ||
+                value <= MaxValue.Value - step)
             {
-                Value += val;
+                value += step;
             }
+            if (!MinValue.HasValue ||
+                value < MinValue)
+            {
+                value = MinValue ?? 0;
+            }
+            Value = value;
         }
 
         private void DownButtonClick(object sender, RoutedEventArgs e)
         {
-            decimal val = StepValue;
-            if (MinValue == decimal.MinValue ||
-                Value >= MinValue + val)
+            decimal value = Value;
+            decimal step = StepValue();
+            if (!MinValue.HasValue ||
+                value >= MinValue + step)
             {
-                Value -= val;
+                value -= step;
             }
+            if (!MaxValue.HasValue ||
+                value > MaxValue)
+            {
+                value = MaxValue ?? 0;
+            }
+            Value = value;
         }
     }
 }

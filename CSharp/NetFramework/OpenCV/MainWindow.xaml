@@ -22,17 +22,18 @@
             <Button FontFamily="Segoe MDL2 Assets"
                     Content="&#xE72B;"
                     Command="{Binding TargetToSource}"/>
+            <Separator/>
             <ComboBox IsEditable="False"
                       IsReadOnly="True"
                       Width="100"
                       ItemsSource="{Binding TemplateMatchModeList}"
                       SelectedItem="{Binding SelectedTemplateMatchMode}"/>
-            <TextBox Text="{Binding Threshold}"
-                     Width="50"/>
+            <Controls:NumericUpDown Value="{Binding Threshold}"
+                                    MinValue="0.1"
+                                    MaxValue="1"
+                                    DecimalPlace="1"/>
             <Button Content="Search"
                     Command="{Binding Search}"/>
-            <Button Content="SearchClear"
-                    Command="{Binding SearchClear}"/>
             <Separator/>
             <Button Content="Match"
                     Command="{Binding Match}"/>

@@ -13,19 +13,23 @@
     </Style>
     <!--#endregion ControlBorder-->
 
+    <SolidColorBrush x:Key="TextBox.Static.Background" Color="White"/>
     <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="White"/>
     <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
+    <SolidColorBrush x:Key="TextBox.Pressed.Background" Color="White"/>
+    <SolidColorBrush x:Key="TextBox.Pressed.Border" Color="#FF7EB4EA"/>
+    <SolidColorBrush x:Key="TextBox.Disabled.Background" Color="White"/>
+    <SolidColorBrush x:Key="TextBox.Disabled.Border" Color="Gray"/>
     <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
-    <sys:Double x:Key="NumericUpDown.Button.Width">50</sys:Double>
     <Style x:Key="NumericUpDownButtonStyle" TargetType="{x:Type RepeatButton}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                     <Border x:Name="splitBorder"
-                            Width="{StaticResource NumericUpDown.Button.Width}"
                             Background="{StaticResource TextBox.Static.Background}"
                             BorderBrush="{StaticResource TextBox.Static.Border}"
-                            BorderThickness="1"
+                            BorderThickness="0"
                             SnapsToDevicePixels="true">
                         <ContentControl HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center"
@@ -44,29 +48,20 @@
                                 <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="false"/>
                                 <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="true"/>
                             </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Static.Editable.Background}"/>
-                            <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.Static.Editable.Border}"/>
+                            <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource TextBox.Static.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource TextBox.Static.Border}"/>
                         </MultiDataTrigger>
-                        <!--<Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.MouseOver.Glyph}"/>
-                        </Trigger>-->
                         <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true">
-                            <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.MouseOver.Editable.Button.Background}"/>
-                            <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.MouseOver.Editable.Button.Border}"/>
+                            <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource TextBox.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource TextBox.MouseOver.Border}"/>
                         </DataTrigger>
-                        <!--<Trigger Property="IsPressed" Value="true">
-                            <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.Pressed.Glyph}"/>
-                        </Trigger>-->
                         <DataTrigger Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="true">
-                            <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Pressed.Editable.Button.Background}"/>
-                            <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.Pressed.Editable.Button.Border}"/>
+                            <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource TextBox.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource TextBox.Pressed.Border}"/>
                         </DataTrigger>
-                        <!--<Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.Disabled.Glyph}"/>
-                        </Trigger>-->
                         <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="false">
-                            <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Disabled.Editable.Button.Background}"/>
-                            <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.Disabled.Editable.Button.Border}"/>
+                            <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource TextBox.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource TextBox.Disabled.Border}"/>
                         </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -77,11 +72,13 @@
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
         <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="Width" Value="80"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:NumericUpDown}">
                     <Border x:Name="border"
-                            Style="{StaticResource ControlBorder}"
+                            Background="Transparent"
+                            BorderThickness="1"
                             BorderBrush="{TemplateBinding BorderBrush}">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="PositiveNegative">
@@ -98,16 +95,11 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="15"/>
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
                             <TextBox x:Name="PART_TextBox"
                                      Grid.Column="0"
-                                     Grid.Row="0"
-                                     Grid.RowSpan="2"
                                      Background="{TemplateBinding Background}"
                                      BorderThickness="0"
                                      VerticalContentAlignment="Center"
@@ -117,18 +109,18 @@
                             </TextBox>
                             <RepeatButton x:Name="PART_UpButton"
                                           Grid.Column="1"
-                                          Grid.Row="0"
                                           Style="{StaticResource NumericUpDownButtonStyle}"
                                           Background="{TemplateBinding Background}"
                                           HorizontalAlignment="Stretch"
-                                          Content="U"/>
+                                          HorizontalContentAlignment="Center"
+                                          Content="+"/>
                             <RepeatButton x:Name="PART_DownButton"
-                                          Grid.Column="1"
-                                          Grid.Row="1"
+                                          Grid.Column="2"
                                           Style="{StaticResource NumericUpDownButtonStyle}"
                                           Background="{TemplateBinding Background}"
                                           HorizontalAlignment="Stretch"
-                                          Content="D"/>
+                                          HorizontalContentAlignment="Center"
+                                          Content="-"/>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
