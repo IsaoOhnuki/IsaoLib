@@ -47,6 +47,15 @@ namespace OpenCV
         }
     }
 
+    public enum MatcherType
+    {
+        BruteForce,
+        BruteForce_L1,
+        BruteForce_Hamming,
+        BruteForce_Hamming2,
+        FlannBased,
+    }
+
     public class ImageSearchViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -106,23 +115,14 @@ namespace OpenCV
             });
             StepMatch = new DefaultCommand(v =>
             {
-                //TemplateMatchModes matchMode =
-                //    (TemplateMatchModes)Enum.Parse(typeof(TemplateMatchModes), SelectedTemplateMatchMode);
-                //Mat result = CvStepMatch(SourceImage, TargetImage, SourceMatView.Mask(), Threshold, matchMode, out OpenCvSharp.Rect[] matches);
-                //TargetMatView.Set(result);
-                //TargetMatView.SearchElements = matches.
-                //    Select(x => new System.Windows.Point[]
-                //    {
-                //        new System.Windows.Point(x.Left, x.Top),
-                //        new System.Windows.Point(x.Right, x.Top),
-                //        new System.Windows.Point(x.Right, x.Bottom),
-                //        new System.Windows.Point(x.Left, x.Bottom),
-                //    }).ToArray();
+                CvMatch();
             });
 
             Enum.GetNames(typeof(TemplateMatchModes)).ToList().
                 ForEach(name => TemplateMatchModeList.Add(name));
             SelectedTemplateMatchMode = TemplateMatchModes.CCoeffNormed.ToString();
+
+            Matchers = Enum.GetValues(typeof(MatcherType)).OfType<MatcherType>().Select(x => x).ToList();
         }
 
         public DefaultCommand SourceToTarget { get; }
@@ -132,6 +132,33 @@ namespace OpenCV
 
         public DefaultCommand Match { get; }
         public DefaultCommand StepMatch { get; }
+
+        public List<MatcherType> Matchers { get; }
+
+        public MatcherType SelectedMatcher
+        {
+            get => _selectedMatcher;
+            set => SetProperty(ref _selectedMatcher, value);
+        }
+        private MatcherType _selectedMatcher;
+
+        public string GetMatcher()
+        {
+            switch (SelectedMatcher)
+            {
+                case MatcherType.BruteForce:
+                    return "BruteForce";
+                case MatcherType.BruteForce_L1:
+                    return "BruteForce-L1";
+                case MatcherType.BruteForce_Hamming:
+                    return "BruteForce-Hamming";
+                case MatcherType.BruteForce_Hamming2:
+                    return "BruteForce-Hamming(2)";
+                case MatcherType.FlannBased:
+                    return "FlannBased";
+            }
+            return string.Empty;
+        }
 
         public ObservableCollection<string> TemplateMatchModeList { get; } = new ObservableCollection<string>();
 
@@ -211,28 +238,22 @@ namespace OpenCV
             return false;
         }
 
-        public void CvMatch(Mat src, Mat dst)
+        public void CvMatch()
         {
-            using (Mat srcDescriptor = new Mat())
-            using (Mat dstDescriptor = new Mat())
-            using (Mat output3 = new Mat())
+            (KeyPoint[] keyPoints1, Mat srcDescriptor) = SourceMatView.CvDetectAndCompute();
+            (KeyPoint[] keyPoints2, Mat dstDescriptor) = TargetMatView.CvDetectAndCompute();
+            using (srcDescriptor)
+            using (dstDescriptor)
+            using (Mat src = BitmapSourceConverter.ToMat(SourceMatView.SourceImage))
+            using (Mat dst = BitmapSourceConverter.ToMat(TargetMatView.SourceImage))
+            using (Mat output = new Mat())
             {
-                //AKAZEのセットアップ
-                AKAZE akaze = AKAZE.Create();
-                //特徴量の検出と特徴量ベクトルの計算
-                akaze.DetectAndCompute(src, null, out KeyPoint[] keyPoints1, srcDescriptor);
-                akaze.DetectAndCompute(dst, null, out KeyPoint[] keyPoints2, dstDescriptor);
-
-                DescriptorMatcher matcher = DescriptorMatcher.Create("BruteForce");
-                //DMatch[] matches = matcher.Match(srcDescriptor, dstDescriptor);
-                //Cv2.DrawMatches(src, keyPoints1, dst, keyPoints2, matches, output3);
-                //Cv2.ImShow("output3", output3);
-
+                DescriptorMatcher matcher = DescriptorMatcher.Create(GetMatcher());
                 DMatch[][] matchess = matcher.KnnMatch(srcDescriptor, dstDescriptor, 3);
                 matchess.Select((x, i) => (x, i)).ToList().ForEach(x =>
                 {
-                    Cv2.DrawMatches(src, keyPoints1, dst, keyPoints2, x.x, output3);
-                    Cv2.ImShow("output" + x.i.ToString(), output3);
+                    Cv2.DrawMatches(src, keyPoints1, dst, keyPoints2, x.x, output);
+                    Cv2.ImShow("output" + x.i.ToString(), output);
                 });
             }
         }

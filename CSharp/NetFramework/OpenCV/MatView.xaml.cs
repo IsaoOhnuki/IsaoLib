@@ -1,7 +1,9 @@
 ﻿using Microsoft.Win32;
 using MVVM;
 using OpenCvSharp;
+using OpenCvSharp.Features2D;
 using OpenCvSharp.WpfExtensions;
+using OpenCvSharp.XFeatures2D;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +11,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -48,6 +51,16 @@ namespace OpenCV
         {
             get => ((MatViewModel)DataContext).MaskImage;
             set => ((MatViewModel)DataContext).MaskImage = value;
+        }
+
+        public (KeyPoint[], Mat) CvDetectAndCompute()
+        {
+            if (DataContext is MatViewModel model)
+            {
+                (KeyPoint[] keyPoints, Mat mat) = model.CvDetectAndCompute(model.MatImage, model.MatMask);
+                return (keyPoints, mat);
+            }
+            return (null, null);
         }
 
         public void CvTemplateMatching(Mat tmpMat, Mat mask, double threshold, TemplateMatchModes matchMode)
@@ -103,6 +116,18 @@ namespace OpenCV
         }
     }
 
+    public enum FeatureDetect
+    {
+        FastFeatureDetector,
+        MSER,
+        BRISK,
+        ORB,
+        StarDetector,
+        SIFT,
+        SURF,
+        AKAZE,
+    }
+
     public class MatViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -136,6 +161,7 @@ namespace OpenCV
 
         public MatViewModel()
         {
+            FeatureDetects = Enum.GetValues(typeof(FeatureDetect)).OfType<FeatureDetect>().Select(x => x).ToList();
             OpenSource = new DefaultCommand(v =>
             {
                 OpenFileDialog dialog = new OpenFileDialog();
@@ -143,6 +169,7 @@ namespace OpenCV
                 {
                     Source.Push(new BitmapImage(new Uri(dialog.FileName)));
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat().Type().ToString();
                     DetectPoints = null;
                 }
             });
@@ -234,14 +261,17 @@ namespace OpenCV
             }, v => SourceImage != null);
             Detect = new DefaultCommand(v =>
             {
-                DetectPoints = CvDetect(Source.Mat());
-                SelectedDetectOctave = null;
-                DetectOctave.Clear();
-                DetectPoints.
-                    Select(x => x.Octave).Distinct().OrderBy(x => x).ToList().
-                        ForEach(x => DetectOctave.Add(x));
-                DetectOctave.Insert(0, -1);
-                SelectedDetectOctave = -1;
+                DetectPoints = CvDetect(MatImage, MatMask);
+                if (DetectPoints != null)
+                {
+                    SelectedDetectOctave = null;
+                    DetectOctave.Clear();
+                    DetectPoints.
+                        Select(x => x.Octave).Distinct().OrderBy(x => x).ToList().
+                            ForEach(x => DetectOctave.Add(x));
+                    DetectOctave.Insert(0, -1);
+                    SelectedDetectOctave = -1;
+                }
             }, v => SourceImage != null);
         }
 
@@ -259,6 +289,49 @@ namespace OpenCV
         public DefaultCommand Erode { get; }
         public DefaultCommand HSV { get; }
         public DefaultCommand Detect { get; }
+
+        public List<FeatureDetect> FeatureDetects { get; }
+
+        public FeatureDetect SelectedFeatureDetect
+        {
+            get => _selectedFeatureDetect;
+            set => SetProperty(ref _selectedFeatureDetect, value);
+        }
+        private FeatureDetect _selectedFeatureDetect;
+
+        // https://pfpfdev.hatenablog.com/entry/20200716/1594909766
+        public Feature2D GetFeature2D()
+        {
+            Feature2D feature = null;
+            switch (SelectedFeatureDetect)
+            {
+                case FeatureDetect.StarDetector:
+                    feature = StarDetector.Create();
+                    break;
+                case FeatureDetect.FastFeatureDetector:
+                    feature = FastFeatureDetector.Create();
+                    break;
+                case FeatureDetect.ORB:
+                    feature = ORB.Create();
+                    break;
+                case FeatureDetect.MSER:
+                    feature = MSER.Create();
+                    break;
+                case FeatureDetect.BRISK:
+                    feature = BRISK.Create();
+                    break;
+                case FeatureDetect.AKAZE:
+                    feature = AKAZE.Create();
+                    break;
+                case FeatureDetect.SIFT:
+                    feature = SIFT.Create();
+                    break;
+                case FeatureDetect.SURF:
+                    //feature = SURF.Create();
+                    break;
+            }
+            return feature;
+        }
 
         public ObservableCollection<int> DetectOctave { get; } = new ObservableCollection<int>();
 
@@ -316,6 +389,13 @@ namespace OpenCV
         }
         private BitmapSource _maskImage;
 
+        public string SourceType
+        {
+            get => _sourceType;
+            set => SetProperty(ref _sourceType, value);
+        }
+        private string _sourceType;
+
         public Mat MatImage
         {
             get => Source.Mat();
@@ -323,6 +403,7 @@ namespace OpenCV
             {
                 Source.Push(value);
                 SourceImage = Source.Get();
+                SourceType = value.Type().ToString();
             }
         }
 
@@ -364,12 +445,10 @@ namespace OpenCV
             return dst;
         }
 
-        public KeyPoint[] CvDetect(Mat src)
+        public KeyPoint[] CvDetect(Mat src, Mat mask)
         {
-            //AKAZEのセットアップ
-            AKAZE akaze = AKAZE.Create();
-            //特徴量の検出
-            return akaze.Detect(src, null);
+            Feature2D feature = GetFeature2D();
+            return feature?.Detect(src, mask);
         }
 
         public Mat CvHSV(Mat src)
@@ -482,6 +561,31 @@ namespace OpenCV
                 dst = null;
             }
             return dst;
+        }
+
+        public (KeyPoint[], Mat) CvDetectAndCompute(Mat src, Mat mask)
+        {
+            Feature2D feature = GetFeature2D();
+            Mat mat = new Mat();
+            feature.DetectAndCompute(src, mask, out KeyPoint[] keyPoints, mat);
+            return (keyPoints, mat);
+        }
+
+        public void CvMatch(KeyPoint[] keyPoints1, Mat srcDescriptor, string matcherType)
+        {
+            (KeyPoint[] keyPoints2, Mat dstDescriptor) = CvDetectAndCompute(MatImage, MatMask);
+            using (srcDescriptor)
+            using (dstDescriptor)
+            using (Mat output = new Mat())
+            {
+                DescriptorMatcher matcher = DescriptorMatcher.Create(matcherType);
+                DMatch[][] matchess = matcher.KnnMatch(srcDescriptor, dstDescriptor, 1);
+                matchess.Select((x, i) => (x, i)).ToList().ForEach(x =>
+                {
+                    //Cv2.DrawMatches(src, keyPoints1, dst, keyPoints2, x.x, output);
+                    //Cv2.ImShow("output" + x.i.ToString(), output);
+                });
+            }
         }
 
         public bool CvTemplateMatching(Mat targetImage, Mat tempImage, double threshold,

@@ -117,6 +117,29 @@
                         ToolTip="HSV"
                         Command="{Binding HSV}"
                         CommandParameter="False"/>
+                <ComboBox Style="{DynamicResource FlyoutStyle}"
+                          ToolTip="Feature"
+                          IsEnabled="{Binding SourceImage,
+                                              Converter={StaticResource NullableToBoolianConverter}}"
+                          ItemsSource="{Binding FeatureDetects}"
+                          SelectedValue="{Binding SelectedFeatureDetect}">
+                    <ComboBox.Tag>
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xECAD;"
+                                   IsEnabled="{Binding SourceImage,
+                                                       Converter={StaticResource NullableToBoolianConverter}}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </ComboBox.Tag>
+                </ComboBox>
                 <Button FontFamily="Segoe MDL2 Assets"
                         Content="&#xECAD;"
                         ToolTip="Detect"
@@ -187,6 +210,11 @@
                                   ItemsSource="{Binding MatchElements}"
                                   Visibility="{Binding MatchResult,
                                                        Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <Label Content="{Binding SourceType}"
+                       Background="#7F7F7F7F"
+                       Foreground="White"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"/>
             </Grid>
         </ScrollViewer>
         <ScrollViewer Grid.Row="1"

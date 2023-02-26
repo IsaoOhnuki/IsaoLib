@@ -38,6 +38,12 @@
             <Separator/>
             <Button Content="Match"
                     Command="{Binding Match}"/>
+            <Separator/>
+            <ComboBox IsEditable="False"
+                      IsReadOnly="True"
+                      Width="100"
+                      ItemsSource="{Binding Matchers}"
+                      SelectedItem="{Binding SelectedMatcher}"/>
             <Button Content="StepMatch"
                     Command="{Binding StepMatch}"/>
         </ToolBar>
