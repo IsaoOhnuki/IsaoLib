@@ -11,6 +11,7 @@
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <local:NullableToBoolianConverter x:Key="NullableToBoolianConverter"/>
+            <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter"/>
 
             <ControlTemplate x:Key="MatViewToolBar" TargetType="ToolBar">
                 <ToolBar>
@@ -210,13 +211,17 @@
                                   ItemsSource="{Binding MatchElements}"
                                   Visibility="{Binding MatchResult,
                                                        Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                <Label Content="{Binding SourceType}"
-                       Background="#7F7F7F7F"
-                       Foreground="White"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"/>
             </Grid>
         </ScrollViewer>
+        <Label Grid.Row="0"
+               Grid.Column="1"
+               Content="{Binding SourceType}"
+               Visibility="{Binding SourceType,
+                                    Converter={StaticResource NullableToVisibilityConverter}}"
+               Background="#7F7F7F7F"
+               Foreground="White"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"/>
         <ScrollViewer Grid.Row="1"
                       Grid.Column="1"
                       VerticalScrollBarVisibility="Auto"

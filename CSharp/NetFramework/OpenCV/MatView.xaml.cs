@@ -44,7 +44,7 @@ namespace OpenCV
         public BitmapSource SourceImage
         {
             get => ((MatViewModel)DataContext).SourceImage;
-            set => ((MatViewModel)DataContext).SourceImage = value;
+            set => ((MatViewModel)DataContext).MatImage = BitmapSourceConverter.ToMat(value);
         }
 
         public BitmapSource MaskImage
@@ -53,14 +53,15 @@ namespace OpenCV
             set => ((MatViewModel)DataContext).MaskImage = value;
         }
 
-        public (KeyPoint[], Mat) CvDetectAndCompute()
+        public bool CvDetectAndCompute(out (KeyPoint[] keyPoints, Mat mat) ret)
         {
             if (DataContext is MatViewModel model)
             {
-                (KeyPoint[] keyPoints, Mat mat) = model.CvDetectAndCompute(model.MatImage, model.MatMask);
-                return (keyPoints, mat);
+                ret = model.CvDetectAndCompute(model.MatImage, model.MatMask);
+                return ret.mat != null;
             }
-            return (null, null);
+            ret = (null, null);
+            return false;
         }
 
         public void CvTemplateMatching(Mat tmpMat, Mat mask, double threshold, TemplateMatchModes matchMode)
@@ -111,6 +112,19 @@ namespace OpenCV
         }
 
         public override object ConvertBack(bool value, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class NullableToVisibilityConverter : ConverterBase<object, Visibility>
+    {
+        public override Visibility Convert(object value, object parameter, CultureInfo culture)
+        {
+            return value != null ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public override object ConvertBack(Visibility value, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
@@ -169,7 +183,7 @@ namespace OpenCV
                 {
                     Source.Push(new BitmapImage(new Uri(dialog.FileName)));
                     SourceImage = Source.Get();
-                    SourceType = Source.Mat().Type().ToString();
+                    SourceType = Source.Mat()?.Type().ToString();
                     DetectPoints = null;
                 }
             });
@@ -177,11 +191,13 @@ namespace OpenCV
             {
                 Source.Undo();
                 SourceImage = Source.Get();
+                SourceType = Source.Mat()?.Type().ToString();
             }, v => Source.CanUndo);
             RedoSource = new DefaultCommand(v =>
             {
                 Source.Redo();
                 SourceImage = Source.Get();
+                SourceType = Source.Mat()?.Type().ToString();
             }, v => Source.CanRedo);
             ToMask = new DefaultCommand(v =>
             {
@@ -194,6 +210,7 @@ namespace OpenCV
                 {
                     Source.Push(dst);
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat()?.Type().ToString();
                 }
             }, v => SourceImage != null);
             BinaryReverse = new DefaultCommand(v =>
@@ -203,6 +220,7 @@ namespace OpenCV
                 {
                     Source.Push(dst);
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat()?.Type().ToString();
                 }
             }, v => SourceImage != null);
             Binary = new DefaultCommand(v =>
@@ -212,6 +230,7 @@ namespace OpenCV
                 {
                     Source.Push(dst);
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat()?.Type().ToString();
                 }
             }, v => SourceImage != null);
             MedianBlur = new DefaultCommand(v =>
@@ -221,6 +240,7 @@ namespace OpenCV
                 {
                     Source.Push(dst);
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat()?.Type().ToString();
                 }
             }, v => SourceImage != null);
             Contour = new DefaultCommand(v =>
@@ -230,6 +250,7 @@ namespace OpenCV
                 {
                     Source.Push(dst);
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat()?.Type().ToString();
                 }
             }, v => SourceImage != null);
             Dilate = new DefaultCommand(v =>
@@ -239,6 +260,7 @@ namespace OpenCV
                 {
                     Source.Push(dst);
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat()?.Type().ToString();
                 }
             }, v => SourceImage != null);
             Erode = new DefaultCommand(v =>
@@ -248,6 +270,7 @@ namespace OpenCV
                 {
                     Source.Push(dst);
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat()?.Type().ToString();
                 }
             }, v => SourceImage != null);
             HSV = new DefaultCommand(v =>
@@ -257,6 +280,7 @@ namespace OpenCV
                 {
                     Source.Push(dst);
                     SourceImage = Source.Get();
+                    SourceType = Source.Mat()?.Type().ToString();
                 }
             }, v => SourceImage != null);
             Detect = new DefaultCommand(v =>
@@ -394,7 +418,7 @@ namespace OpenCV
             get => _sourceType;
             set => SetProperty(ref _sourceType, value);
         }
-        private string _sourceType;
+        private string _sourceType = null;
 
         public Mat MatImage
         {
@@ -403,7 +427,7 @@ namespace OpenCV
             {
                 Source.Push(value);
                 SourceImage = Source.Get();
-                SourceType = value.Type().ToString();
+                SourceType = value?.Type().ToString();
             }
         }
 
@@ -567,8 +591,16 @@ namespace OpenCV
         {
             Feature2D feature = GetFeature2D();
             Mat mat = new Mat();
-            feature.DetectAndCompute(src, mask, out KeyPoint[] keyPoints, mat);
-            return (keyPoints, mat);
+            try
+            {
+                feature.DetectAndCompute(src, mask, out KeyPoint[] keyPoints, mat);
+                return (keyPoints, mat);
+            }
+            catch
+            {
+                mat.Dispose();
+                return (null, null);
+            }
         }
 
         public void CvMatch(KeyPoint[] keyPoints1, Mat srcDescriptor, string matcherType)
