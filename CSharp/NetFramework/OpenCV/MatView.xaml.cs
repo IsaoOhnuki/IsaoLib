@@ -297,6 +297,9 @@ namespace OpenCV
                     SelectedDetectOctave = -1;
                 }
             }, v => SourceImage != null);
+
+            Enumerable.Range(-1, 11).ToList().
+                ForEach(x => DetectResponse.Add(x));
         }
 
         public DefaultCommand OpenSource { get; }
@@ -324,6 +327,7 @@ namespace OpenCV
         private FeatureDetect _selectedFeatureDetect;
 
         // https://pfpfdev.hatenablog.com/entry/20200716/1594909766
+        // https://campkougaku.com/2020/07/16/estimateaffine2d/
         public Feature2D GetFeature2D()
         {
             Feature2D feature = null;
@@ -365,6 +369,15 @@ namespace OpenCV
             set => SetProperty(ref _selectedDetectOctave, value);
         }
         private int? _selectedDetectOctave;
+
+        public ObservableCollection<int> DetectResponse { get; } = new ObservableCollection<int>();
+
+        public int SelectedDetectResponse
+        {
+            get => _selectedDetectResponse;
+            set => SetProperty(ref _selectedDetectResponse, value);
+        }
+        private int _selectedDetectResponse;
 
         public KeyPoint[] DetectPoints
         {
@@ -964,6 +977,19 @@ namespace OpenCV
                 ret = (x_current, y_current, (float)drc_current);
                 return true;
             }
+        }
+    }
+
+    public class ResponseToBrushConverter : ConverterBase<int, Brush>
+    {
+        public override Brush Convert(int value, object parameter, CultureInfo culture)
+        {
+            return value < 0 ? null : DetectPanel.ResponseBrushes[value];
+        }
+
+        public override int ConvertBack(Brush value, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

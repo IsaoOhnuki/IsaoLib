@@ -29,7 +29,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
             <ScrollViewer Grid.Column="0"
                           HorizontalScrollBarVisibility="Auto"
@@ -44,10 +44,38 @@
             <ScrollViewer Grid.Column="2"
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto">
-                <Image HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Source="{Binding TargetImage}"
-                       Stretch="None"/>
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FF000000"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FF0000C8"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FF4000FF"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FF8000FF"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FFC800C8"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FFFF0000"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FFFF5200"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FFFF9800"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FFFFD200"/>
+                    <Border Width="50"
+                            Height="50"
+                            Background="#FFECEC00"/>
+                </StackPanel>
             </ScrollViewer>
         </Grid>
     </Grid>

@@ -12,33 +12,7 @@
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <local:NullableToBoolianConverter x:Key="NullableToBoolianConverter"/>
             <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter"/>
-
-            <ControlTemplate x:Key="MatViewToolBar" TargetType="ToolBar">
-                <ToolBar>
-                    <Button Content="Source"
-                        Command="{Binding OpenSource}"/>
-                    <Button FontFamily="Segoe MDL2 Assets"
-                        Content="&#xE7A7;"
-                        Command="{Binding UndoSource}"/>
-                    <Button FontFamily="Segoe MDL2 Assets"
-                        Content="&#xE7A6;"
-                        Command="{Binding RedoSource}"/>
-                    <Button FontFamily="Segoe MDL2 Assets"
-                        Content="&#xE73B;"
-                        Command="{Binding Gray}"
-                        CommandParameter="False"
-                        Foreground="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
-                    <Button Content="HSV"
-                        Command="{Binding HSV}"
-                        CommandParameter="False"/>
-                    <Button Content="Detect"
-                        Command="{Binding Detect}"
-                        CommandParameter="False"/>
-                    <ComboBox Width="50"
-                          ItemsSource="{Binding SourceOctave}"
-                          SelectedItem="{Binding SelectedSourceOctave}"/>
-                </ToolBar>
-            </ControlTemplate>
+            <local:ResponseToBrushConverter x:Key="ResponseToBrushConverter"/>
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/SharedLib;component/Themes/StyleDictionary.xaml"/>
@@ -167,6 +141,34 @@
                         </TextBlock>
                     </ComboBox.Tag>
                 </ComboBox>
+                <ComboBox Style="{DynamicResource FlyoutStyle}"
+                          ToolTip="Response"
+                          IsEnabled="{Binding DetectResult}"
+                          ItemsSource="{Binding DetectResponse}"
+                          SelectedValue="{Binding SelectedDetectResponse}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding Converter={StaticResource ResponseToBrushConverter}}"
+                                    Width="20"
+                                    Height="20"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <ComboBox.Tag>
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xE7B7;"
+                                   IsEnabled="{Binding DetectResult}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </ComboBox.Tag>
+                </ComboBox>
                 <Separator/>
                 <ToggleButton FontFamily="Segoe MDL2 Assets"
                               Content="&#xE82F;"
@@ -203,6 +205,7 @@
                 <local:DetectPanel x:Name="detectPanel"
                                    Background="#7FFFFFFF"
                                    Octave="{Binding SelectedDetectOctave}"
+                                   Response="{Binding SelectedDetectResponse}"
                                    ItemsSource="{Binding DetectPoints}"
                                    Visibility="{Binding DetectResult,
                                                         Converter={StaticResource BooleanToVisibilityConverter}}"/>

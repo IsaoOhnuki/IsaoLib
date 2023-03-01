@@ -240,25 +240,29 @@ namespace OpenCV
 
         public void CvMatch()
         {
-            if (SourceMatView.CvDetectAndCompute(out (KeyPoint[] keyPoints1, Mat srcDescriptor) ret1) &&
-                TargetMatView.CvDetectAndCompute(out (KeyPoint[] keyPoints2, Mat dstDescriptor) ret2))
+            if (SourceMatView.CvDetectAndCompute(out (KeyPoint[] keyPoints1, Mat srcDescriptor) ret1))
             {
                 using (ret1.srcDescriptor)
-                using (ret2.dstDescriptor)
-                using (Mat src = BitmapSourceConverter.ToMat(SourceMatView.SourceImage))
-                using (Mat dst = BitmapSourceConverter.ToMat(TargetMatView.SourceImage))
-                using (Mat output = new Mat())
                 {
-                    DescriptorMatcher matcher = DescriptorMatcher.Create(GetMatcher());
-                    DMatch[][] matchess = matcher.KnnMatch(ret1.srcDescriptor, ret2.dstDescriptor, 3);
-                    matchess.SelectMany((x, i) => x.Select((y, ii) => (y, i, ii))).
-                        GroupBy(x => x.ii).ToList().
-                            ForEach(x =>
-                            {
-                                DMatch[] ds = x.OrderBy(y => y.i).Select(y => y.y).ToArray();
-                                Cv2.DrawMatches(src, ret1.keyPoints1, dst, ret2.keyPoints2, ds, output);
-                                Cv2.ImShow("output" + x.Key.ToString(), output);
-                            });
+                    if (TargetMatView.CvDetectAndCompute(out (KeyPoint[] keyPoints2, Mat dstDescriptor) ret2))
+                    {
+                        using (ret2.dstDescriptor)
+                        using (Mat src = BitmapSourceConverter.ToMat(SourceMatView.SourceImage))
+                        using (Mat dst = BitmapSourceConverter.ToMat(TargetMatView.SourceImage))
+                        using (Mat output = new Mat())
+                        {
+                            DescriptorMatcher matcher = DescriptorMatcher.Create(GetMatcher());
+                            DMatch[][] matchess = matcher.KnnMatch(ret1.srcDescriptor, ret2.dstDescriptor, 3);
+                            matchess.SelectMany((x, i) => x.Select((y, ii) => (y, i, ii))).
+                                GroupBy(x => x.ii).ToList().
+                                    ForEach(x =>
+                                    {
+                                        DMatch[] ds = x.OrderBy(y => y.i).Select(y => y.y).ToArray();
+                                        Cv2.DrawMatches(src, ret1.keyPoints1, dst, ret2.keyPoints2, ds, output);
+                                        Cv2.ImShow("output" + x.Key.ToString(), output);
+                                    });
+                        }
+                    }
                 }
             }
         }

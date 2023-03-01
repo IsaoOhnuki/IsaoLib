@@ -41,29 +41,75 @@ namespace OpenCV
                 nameof(Octave),
                 typeof(int),
                 typeof(DetectPanel),
-                new PropertyMetadata(
+                new FrameworkPropertyMetadata(
                     -1,
+                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                     (s, e) =>
                     {
                         if (s is DetectPanel ctrl &&
                             e.NewValue is int octave)
                         {
-                            ctrl.canvas.Children.Clear();
-                            ctrl.AnchorCollection.ForEach(x =>
-                            {
-                                if (octave < 0 || octave == (int)x.Tag)
-                                {
-                                    ctrl.canvas.Children.Add(x);
-                                }
-                            });
+                            ctrl.ShowAnchor(octave, ctrl.Response);
                         }
                     }));
+
+        public int Response
+        {
+            get => (int)GetValue(ResponseProperty);
+            set => SetValue(ResponseProperty, value);
+        }
+
+        public static readonly DependencyProperty ResponseProperty =
+            DependencyProperty.Register(
+                nameof(Response),
+                typeof(int),
+                typeof(DetectPanel),
+                new FrameworkPropertyMetadata(
+                    -1,
+                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                    (s, e) =>
+                    {
+                        if (s is DetectPanel ctrl &&
+                            e.NewValue is int response)
+                        {
+                            ctrl.ShowAnchor(ctrl.Octave, response);
+                        }
+                    }));
+
+        private void ShowAnchor(int octave, int response)
+        {
+            canvas.Children.Clear();
+            AnchorCollection.ForEach(x =>
+            {
+                (int oct, int resp) = ((int, int))x.Tag;
+                if ((octave < 0 || octave == oct) &&
+                    (response < 0 || response == resp))
+                {
+                    canvas.Children.Add(x);
+                }
+            });
+        }
 
         public KeyPoint[] ItemsSource
         {
             get => (KeyPoint[])GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
+
+        public static Brush[] ResponseBrushes =
+            new Brush[]
+            {
+                new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0x00)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0xC8)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0xFF)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0x40, 0x00, 0xFF)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0xC8, 0x00, 0xC8)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0x00, 0x00)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0x52, 0x00)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0x98, 0x00)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0xD2, 0x00)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0xEC, 0xEC, 0x00)),
+            };
 
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(
@@ -77,10 +123,20 @@ namespace OpenCV
                         if (s is DetectPanel ctrl &&
                             e.NewValue is KeyPoint[] keyPoints)
                         {
+                            List<float> response = keyPoints.
+                                Select(p => p.Response).Distinct().OrderBy(x => x).ToList();
+                            float min = response.First();
+                            float max = response.Last();
+
                             ctrl.canvas.Children.Clear();
                             ctrl.AnchorCollection.Clear();
-                            Array.ForEach(keyPoints, x =>
+                            ctrl.Octave = -1;
+                            ctrl.Response = -1;
+                            keyPoints.OrderBy(x => x.Response).ToList().ForEach(x =>
                             {
+                                int resp = min == 0 && max == 0 ? 0 :
+                                    (int)((x.Response - min) / (max - min) * (ResponseBrushes.Length - 1));
+
                                 double radius = x.Size / 2;
                                 PathGeometry geometry = new PathGeometry();
                                 geometry.AddGeometry(new EllipseGeometry(
@@ -93,9 +149,9 @@ namespace OpenCV
                                         });
                                 Path path = new Path()
                                 {
-                                    Tag = x.Octave,
+                                    Tag = (x.Octave, resp),
                                     Data = geometry,
-                                    Stroke = Brushes.Black,
+                                    Stroke = ResponseBrushes[resp],
                                     StrokeThickness = 1,
                                 };
                                 path.SetValue(Canvas.LeftProperty, (double)x.Pt.X);
