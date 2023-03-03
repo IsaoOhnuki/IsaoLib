@@ -21,7 +21,8 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" MinHeight="40"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -30,7 +31,7 @@
         </Grid.ColumnDefinitions>
         <ToolBarTray Grid.Column="0"
                      Grid.Row="0"
-                     Grid.RowSpan="2"
+                     Grid.RowSpan="3"
                      Orientation="Vertical">
             <ToolBar>
                 <Button FontFamily="Segoe MDL2 Assets"
@@ -92,29 +93,6 @@
                         ToolTip="HSV"
                         Command="{Binding HSV}"
                         CommandParameter="False"/>
-                <ComboBox Style="{DynamicResource FlyoutStyle}"
-                          ToolTip="Feature"
-                          IsEnabled="{Binding SourceImage,
-                                              Converter={StaticResource NullableToBoolianConverter}}"
-                          ItemsSource="{Binding FeatureDetects}"
-                          SelectedValue="{Binding SelectedFeatureDetect}">
-                    <ComboBox.Tag>
-                        <TextBlock FontFamily="Segoe MDL2 Assets"
-                                   Text="&#xECAD;"
-                                   IsEnabled="{Binding SourceImage,
-                                                       Converter={StaticResource NullableToBoolianConverter}}">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsEnabled" Value="false">
-                                            <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </ComboBox.Tag>
-                </ComboBox>
                 <Button FontFamily="Segoe MDL2 Assets"
                         Content="&#xECAD;"
                         ToolTip="Detect"
@@ -195,6 +173,10 @@
             <Grid HorizontalAlignment="Left"
                   VerticalAlignment="Top"
                   Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
+                <Grid.LayoutTransform>
+                    <ScaleTransform ScaleX="{Binding Scale}"
+                                    ScaleY="{Binding Scale}"/>
+                </Grid.LayoutTransform>
                 <Image Source="{Binding SourceImage}"
                        Stretch="None"/>
                 <local:SearchPanel x:Name="searchPanel"
@@ -225,14 +207,39 @@
                Foreground="White"
                HorizontalAlignment="Left"
                VerticalAlignment="Top"/>
-        <ScrollViewer Grid.Row="1"
+        <GridSplitter Grid.Row="1"
                       Grid.Column="1"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Visibility="{Binding MaskType,
+                                           Converter={StaticResource NullableToVisibilityConverter}}"
+                      Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}"
+                      Height="8"/>
+        <ScrollViewer Grid.Row="2"
+                      Grid.Column="1"
+                      HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto"
+                      Visibility="{Binding MaskType,
+                                           Converter={StaticResource NullableToVisibilityConverter}}"
                       Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
             <Image HorizontalAlignment="Left"
                    VerticalAlignment="Top"
                    Source="{Binding MaskImage}"
-                   Stretch="None"/>
+                   Stretch="None">
+                <Image.LayoutTransform>
+                    <ScaleTransform ScaleX="{Binding Scale}"
+                                    ScaleY="{Binding Scale}"/>
+                </Image.LayoutTransform>
+            </Image>
         </ScrollViewer>
+        <Label Grid.Row="2"
+               Grid.Column="1"
+               Content="{Binding MaskType}"
+               Visibility="{Binding MaskType,
+                                    Converter={StaticResource NullableToVisibilityConverter}}"
+               Background="#7F7F7F7F"
+               Foreground="White"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"/>
     </Grid>
 </UserControl>

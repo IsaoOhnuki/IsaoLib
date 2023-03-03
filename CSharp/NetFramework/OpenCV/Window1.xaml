@@ -74,7 +74,7 @@
                             Background="#FFFFD200"/>
                     <Border Width="50"
                             Height="50"
-                            Background="#FFECEC00"/>
+                            Background="#FFE8D600"/>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

@@ -53,6 +53,24 @@ namespace OpenCV
             set => ((MatViewModel)DataContext).MaskImage = value;
         }
 
+        public double Scale
+        {
+            get => ((MatViewModel)DataContext).Scale;
+            set => ((MatViewModel)DataContext).Scale = value;
+        }
+        private double _scale = 1;
+
+        public FeatureDetect SelectedFeatureDetect
+        {
+            get => ((MatViewModel)DataContext).SelectedFeatureDetect;
+            set => ((MatViewModel)DataContext).SelectedFeatureDetect = value;
+        }
+
+        public void Detect()
+        {
+            ((MatViewModel)DataContext).Detect.Execute(null);
+        }
+
         public bool CvDetectAndCompute(out (KeyPoint[] keyPoints, Mat mat) ret)
         {
             if (DataContext is MatViewModel model)
@@ -202,6 +220,7 @@ namespace OpenCV
             ToMask = new DefaultCommand(v =>
             {
                 MaskImage = Source.Get();
+                MaskType = Source.Mat()?.Type().ToString();
             }, v => SourceImage != null);
             Gray = new DefaultCommand(v =>
             {
@@ -433,6 +452,13 @@ namespace OpenCV
         }
         private string _sourceType = null;
 
+        public string MaskType
+        {
+            get => _maskType;
+            set => SetProperty(ref _maskType, value);
+        }
+        private string _maskType = null;
+
         public Mat MatImage
         {
             get => Source.Mat();
@@ -467,6 +493,13 @@ namespace OpenCV
         }
         private bool _matchResult;
 
+        public double Scale
+        {
+            get => _scale;
+            set => SetProperty(ref _scale, value);
+        }
+        private double _scale = 1;
+
         public Mat CvGray(Mat Src)
         {
             Mat dst = new Mat();
@@ -485,7 +518,14 @@ namespace OpenCV
         public KeyPoint[] CvDetect(Mat src, Mat mask)
         {
             Feature2D feature = GetFeature2D();
-            return feature?.Detect(src, mask);
+            try
+            {
+                return feature?.Detect(src, mask);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public Mat CvHSV(Mat src)

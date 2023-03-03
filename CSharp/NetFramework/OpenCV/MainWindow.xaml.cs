@@ -117,12 +117,18 @@ namespace OpenCV
             {
                 CvMatch();
             });
+            Detect = new DefaultCommand(v =>
+            {
+                SourceMatView.Detect();
+                TargetMatView.Detect();
+            });
 
             Enum.GetNames(typeof(TemplateMatchModes)).ToList().
                 ForEach(name => TemplateMatchModeList.Add(name));
             SelectedTemplateMatchMode = TemplateMatchModes.CCoeffNormed.ToString();
 
             Matchers = Enum.GetValues(typeof(MatcherType)).OfType<MatcherType>().Select(x => x).ToList();
+            FeatureDetects = Enum.GetValues(typeof(FeatureDetect)).OfType<FeatureDetect>().Select(x => x).ToList();
         }
 
         public DefaultCommand SourceToTarget { get; }
@@ -133,7 +139,11 @@ namespace OpenCV
         public DefaultCommand Match { get; }
         public DefaultCommand StepMatch { get; }
 
+        public DefaultCommand Detect { get; }
+
         public List<MatcherType> Matchers { get; }
+
+        public List<FeatureDetect> FeatureDetects { get; }
 
         public MatcherType SelectedMatcher
         {
@@ -141,6 +151,30 @@ namespace OpenCV
             set => SetProperty(ref _selectedMatcher, value);
         }
         private MatcherType _selectedMatcher;
+
+        public FeatureDetect SelectedFeatureDetect
+        {
+            get => _selectedFeatureDetect;
+            set
+            {
+                SetProperty(ref _selectedFeatureDetect, value);
+                SourceMatView.SelectedFeatureDetect = value;
+                TargetMatView.SelectedFeatureDetect = value;
+            }
+        }
+        private FeatureDetect _selectedFeatureDetect;
+
+        public double Scale
+        {
+            get => _scale;
+            set
+            {
+                SetProperty(ref _scale, value);
+                SourceMatView.Scale = value;
+                TargetMatView.Scale = value;
+            }
+        }
+        private double _scale = 1;
 
         public string GetMatcher()
         {

@@ -108,7 +108,7 @@ namespace OpenCV
                 new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0x52, 0x00)),
                 new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0x98, 0x00)),
                 new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0xD2, 0x00)),
-                new SolidColorBrush(Color.FromArgb(0xFF, 0xEC, 0xEC, 0x00)),
+                new SolidColorBrush(Color.FromArgb(0xFF, 0xE8, 0xD6, 0x00)),
             };
 
         public static readonly DependencyProperty ItemsSourceProperty =
@@ -121,7 +121,8 @@ namespace OpenCV
                     (s, e) =>
                     {
                         if (s is DetectPanel ctrl &&
-                            e.NewValue is KeyPoint[] keyPoints)
+                            e.NewValue is KeyPoint[] keyPoints &&
+                            keyPoints.Length > 0)
                         {
                             List<float> response = keyPoints.
                                 Select(p => p.Response).Distinct().OrderBy(x => x).ToList();
