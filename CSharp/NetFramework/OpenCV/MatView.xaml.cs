@@ -58,7 +58,6 @@ namespace OpenCV
             get => ((MatViewModel)DataContext).Scale;
             set => ((MatViewModel)DataContext).Scale = value;
         }
-        private double _scale = 1;
 
         public FeatureDetect SelectedFeatureDetect
         {
@@ -316,6 +315,22 @@ namespace OpenCV
                     SelectedDetectOctave = -1;
                 }
             }, v => SourceImage != null);
+            DetectAndCompute = new DefaultCommand(v =>
+            {
+                (KeyPoint[] keyPoints, Mat descriptorImage) = CvDetectAndCompute(MatImage, MatMask);
+                DetectPoints = keyPoints;
+                if (DetectPoints != null)
+                {
+                    SelectedDetectOctave = null;
+                    DetectOctave.Clear();
+                    DetectPoints.
+                        Select(x => x.Octave).Distinct().OrderBy(x => x).ToList().
+                            ForEach(x => DetectOctave.Add(x));
+                    DetectOctave.Insert(0, -1);
+                    SelectedDetectOctave = -1;
+                }
+                descriptorImage?.Dispose();
+            });
 
             Enumerable.Range(-1, 11).ToList().
                 ForEach(x => DetectResponse.Add(x));
@@ -335,6 +350,7 @@ namespace OpenCV
         public DefaultCommand Erode { get; }
         public DefaultCommand HSV { get; }
         public DefaultCommand Detect { get; }
+        public DefaultCommand DetectAndCompute { get; set; }
 
         public List<FeatureDetect> FeatureDetects { get; }
 
@@ -528,6 +544,22 @@ namespace OpenCV
             }
         }
 
+        public (KeyPoint[], Mat) CvDetectAndCompute(Mat src, Mat mask)
+        {
+            Mat mat = new Mat();
+            try
+            {
+                Feature2D feature = GetFeature2D();
+                feature.DetectAndCompute(src, mask, out KeyPoint[] keyPoints, mat);
+                return (keyPoints, mat);
+            }
+            catch
+            {
+                mat.Dispose();
+                return (null, null);
+            }
+        }
+
         public Mat CvHSV(Mat src)
         {
             Mat dst = new Mat();
@@ -638,22 +670,6 @@ namespace OpenCV
                 dst = null;
             }
             return dst;
-        }
-
-        public (KeyPoint[], Mat) CvDetectAndCompute(Mat src, Mat mask)
-        {
-            Feature2D feature = GetFeature2D();
-            Mat mat = new Mat();
-            try
-            {
-                feature.DetectAndCompute(src, mask, out KeyPoint[] keyPoints, mat);
-                return (keyPoints, mat);
-            }
-            catch
-            {
-                mat.Dispose();
-                return (null, null);
-            }
         }
 
         public void CvMatch(KeyPoint[] keyPoints1, Mat srcDescriptor, string matcherType)
