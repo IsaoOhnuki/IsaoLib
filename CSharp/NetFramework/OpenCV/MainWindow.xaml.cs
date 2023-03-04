@@ -47,15 +47,6 @@ namespace OpenCV
         }
     }
 
-    public enum MatcherType
-    {
-        BruteForce,
-        BruteForce_L1,
-        BruteForce_Hamming,
-        BruteForce_Hamming2,
-        FlannBased,
-    }
-
     public class ImageSearchViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -129,7 +120,29 @@ namespace OpenCV
 
             Matchers = Enum.GetValues(typeof(MatcherType)).OfType<MatcherType>().Select(x => x).ToList();
             FeatureDetects = Enum.GetValues(typeof(FeatureDetect)).OfType<FeatureDetect>().Select(x => x).ToList();
+
+            // opencv DescriptorMatcher
+            // https://whoopsidaisies.hatenablog.com/entry/2013/12/07/135810
+            // https://pystyle.info/opencv-feature-matching/
+            // https://takkkun.hatenablog.com/entry/2018/12/06/OpenCV%E3%81%AEDescriptorMatcher%E3%81%AE%E8%A9%B1
+            Algorithm.Add((MatcherType.BruteForce, FeatureDetect.SIFT), true);
+            Algorithm.Add((MatcherType.BruteForce_L1, FeatureDetect.SIFT), true);
+            Algorithm.Add((MatcherType.FlannBased, FeatureDetect.SIFT), true);
+            Algorithm.Add((MatcherType.BruteForce, FeatureDetect.SURF), true);
+            Algorithm.Add((MatcherType.BruteForce_L1, FeatureDetect.SURF), true);
+            Algorithm.Add((MatcherType.FlannBased, FeatureDetect.SURF), true);
+            Algorithm.Add((MatcherType.BruteForce, FeatureDetect.BRISK), true);
+            Algorithm.Add((MatcherType.BruteForce_L1, FeatureDetect.BRISK), true);
+            Algorithm.Add((MatcherType.BruteForce_Hamming, FeatureDetect.BRISK), true);
+            Algorithm.Add((MatcherType.BruteForce_Hamming2, FeatureDetect.BRISK), true);
+            Algorithm.Add((MatcherType.BruteForce, FeatureDetect.ORB), true);
+            Algorithm.Add((MatcherType.BruteForce_L1, FeatureDetect.ORB), true);
+            Algorithm.Add((MatcherType.BruteForce_Hamming, FeatureDetect.ORB), true);
+            Algorithm.Add((MatcherType.BruteForce_Hamming2, FeatureDetect.ORB), true);
         }
+
+        public Dictionary<(MatcherType, FeatureDetect), bool> Algorithm { get; } =
+            new Dictionary<(MatcherType, FeatureDetect), bool>();
 
         public DefaultCommand SourceToTarget { get; }
         public DefaultCommand TargetToSource { get; }

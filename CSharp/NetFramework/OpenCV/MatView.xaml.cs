@@ -147,6 +147,15 @@ namespace OpenCV
         }
     }
 
+    public enum MatcherType
+    {
+        BruteForce,
+        BruteForce_L1,
+        BruteForce_Hamming,
+        BruteForce_Hamming2,
+        FlannBased,
+    }
+
     public enum FeatureDetect
     {
         FastFeatureDetector,
