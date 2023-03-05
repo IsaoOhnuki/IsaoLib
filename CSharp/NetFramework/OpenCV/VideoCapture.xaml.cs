@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace OpenCV
 {
@@ -30,7 +31,16 @@ namespace OpenCV
         public VideoCapture()
         {
             InitializeComponent();
-            DataContext = new ViewModel();
+            DataContext = new ViewModel(Dispatcher);
+            Closing += VideoCaptureClosing;
+        }
+
+        private void VideoCaptureClosing(object sender, CancelEventArgs e)
+        {
+            if (DataContext is ViewModel model)
+            {
+                model.Cancel();
+            }
         }
     }
 
@@ -47,24 +57,58 @@ namespace OpenCV
             OnPropertyChanged(name);
         }
 
-        public ViewModel()
+        CancellationTokenSource LockObj;
+        Dispatcher Dispatcher;
+
+        public ViewModel(Dispatcher dispatcher)
         {
+            Dispatcher = dispatcher;
             OpenSource = new DefaultCommand(v =>
             {
-                Video();
+                if (v is bool check)
+                {
+                    if (check)
+                    {
+                        LockObj = new CancellationTokenSource();
+                        Video(LockObj, LockObj.Token);
+                    }
+                    else
+                    {
+                        LockObj?.Cancel();
+                        LockObj = null;
+                    }
+                }
             });
         }
 
         public DefaultCommand OpenSource { get; }
 
-        public BitmapImage SourceImage
+        public BitmapSource SourceImage
         {
             get => _sourceImage;
             set => SetProperty(ref _sourceImage, value);
         }
-        private BitmapImage _sourceImage;
+        private BitmapSource _sourceImage;
 
-        public void Video()
+        public void SetSourceImage(Mat sourceImage)
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                SourceImage = sourceImage != null ? BitmapSourceConverter.ToBitmapSource(sourceImage) : null;
+            }
+            else
+            {
+                Dispatcher.Invoke(() => SetSourceImage(sourceImage));
+            }
+        }
+
+        public void Cancel()
+        {
+            LockObj?.Cancel();
+            LockObj = null;
+        }
+
+        public void Video(object lockObj, CancellationToken token)
         {
             Thread thread = new Thread(() =>
             {
@@ -73,7 +117,6 @@ namespace OpenCV
                 if (video.IsOpened())
                 {
                     var fs = FrameSource.CreateFrameSource_Camera(0);
-                    using (var normalWindow = new OpenCvSharp.Window("normal"))
                     using (var normalFrame = new Mat())
                     using (var srFrame = new Mat())
                     {
@@ -81,12 +124,24 @@ namespace OpenCV
                         {
                             video.Read(normalFrame);
                             if (normalFrame.Empty())
+                            {
                                 break;
+                            }
 
-                            normalWindow.ShowImage(normalFrame);
-                            int key = Cv2.WaitKey(100);
-                            if (key == 27) break;   // ESC キーで閉じる
+                            lock (lockObj)
+                            {
+                                try
+                                {
+                                    token.ThrowIfCancellationRequested();
+                                }
+                                catch
+                                {
+                                    break;
+                                }
+                                SetSourceImage(normalFrame);
+                            }
                         }
+                        SetSourceImage(null);
                     }
                 }
             });

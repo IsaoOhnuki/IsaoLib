@@ -12,12 +12,12 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0">
-            <Button>
-                <Button FontFamily="Segoe MDL2 Assets"
-                        Content="&#xECAD;"
-                        ToolTip="Detect"
-                        Command="{Binding OpenSource}"/>
-            </Button>
+            <ToggleButton Command="{Binding OpenSource}"
+                          CommandParameter="{Binding  RelativeSource={RelativeSource Self}, Path=IsChecked}">
+                <TextBlock FontFamily="Segoe MDL2 Assets"
+                           Text="&#xECAD;"
+                           ToolTip="Detect"/>
+            </ToggleButton>
         </ToolBar>
         <Grid Grid.Row="1">
             <Image Source="{Binding SourceImage}"
