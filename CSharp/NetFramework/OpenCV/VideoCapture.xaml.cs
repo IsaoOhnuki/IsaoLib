@@ -128,20 +128,23 @@ namespace OpenCV
                                 break;
                             }
 
+                            try
+                            {
+                                token.ThrowIfCancellationRequested();
+                            }
+                            catch
+                            {
+                                break;
+                            }
                             lock (lockObj)
                             {
-                                try
-                                {
-                                    token.ThrowIfCancellationRequested();
-                                }
-                                catch
-                                {
-                                    break;
-                                }
                                 SetSourceImage(normalFrame);
                             }
                         }
-                        SetSourceImage(null);
+                        lock (lockObj)
+                        {
+                            SetSourceImage(null);
+                        }
                     }
                 }
             });
