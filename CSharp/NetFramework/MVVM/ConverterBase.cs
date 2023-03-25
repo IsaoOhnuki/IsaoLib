@@ -25,6 +25,34 @@ namespace MVVM
         public override object ProvideValue(IServiceProvider serviceProvider) => this;
     }
 
+    public abstract class MultiValueConverterBase<TSource, TTarget> : MarkupExtension, IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+            => Convert(values.Select(x => (TSource)x).ToArray(), parameter, culture);
+
+        public abstract TTarget Convert(TSource[] values, object parameter, CultureInfo culture);
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+            => ConvertBack((TTarget)value, parameter, culture).Select(x => (object)x).ToArray();
+
+        public abstract TSource[] ConvertBack(TTarget value, object parameter, CultureInfo culture);
+
+        public override object ProvideValue(IServiceProvider serviceProvider) => this;
+    }
+
+    public class MultiBooleanToVisibilityConverter : MultiValueConverterBase<bool, Visibility>
+    {
+        public override Visibility Convert(bool[] values, object parameter, CultureInfo culture)
+        {
+            return values.All(x => x) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public override bool[] ConvertBack(Visibility value, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class EnumTypeToVisibilityConverter : ConverterBase<object, Visibility>
     {
         public EnumTypeToVisibilityConverter()
