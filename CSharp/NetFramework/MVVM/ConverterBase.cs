@@ -40,26 +40,14 @@ namespace MVVM
         public override object ProvideValue(IServiceProvider serviceProvider) => this;
     }
 
-    public class MultiBooleanToVisibilityConverter : MultiValueConverterBase<bool, Visibility>
+    public abstract class EnumConverterBase<TTarget> : ConverterBase<object, TTarget>
     {
-        public override Visibility Convert(bool[] values, object parameter, CultureInfo culture)
+        public EnumConverterBase()
         {
-            return values.All(x => x) ? Visibility.Visible : Visibility.Collapsed;
+            EnumType = typeof(object);
         }
 
-        public override bool[] ConvertBack(Visibility value, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class EnumTypeToVisibilityConverter : ConverterBase<object, Visibility>
-    {
-        public EnumTypeToVisibilityConverter()
-        {
-        }
-
-        public EnumTypeToVisibilityConverter(Type enumType)
+        public EnumConverterBase(Type enumType)
         {
             EnumType = enumType;
         }
@@ -67,43 +55,94 @@ namespace MVVM
         [ConstructorArgument("enumType")]
         public Type EnumType { get; set; }
 
+        public bool ConvertBase(object value, object parameter, CultureInfo culture)
+        {
+            if (value == null || parameter == null)
+            {
+                return false;
+            }
+
+            if (parameter != null &&
+                parameter.GetType().IsArray &&
+                parameter.GetType().GetElementType() == EnumType &&
+                parameter is Array array &&
+                Enumerable.Range(0, array.Length).Select(x => array.GetValue(x)).ToArray() is object[] enumValues)
+            {
+                object enumValue = Enum.Parse(EnumType, value.ToString());
+                return enumValues.Any(x => x.Equals(enumValue));
+            }
+            else
+            {
+                return Enum.Parse(EnumType, value.ToString()).Equals(Enum.Parse(EnumType, parameter.ToString()));
+            }
+        }
+
+        public override object ConvertBack(TTarget value, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class EnumToBooleanConverter : EnumConverterBase<bool>
+    {
+        public override bool Convert(object value, object parameter, CultureInfo culture)
+        {
+            return ConvertBase(value, parameter, culture);
+        }
+    }
+
+    public class EnumToVisibilityConverter : EnumConverterBase<Visibility>
+    {
         public override Visibility Convert(object value, object parameter, CultureInfo culture)
         {
-            return Enum.Parse(EnumType, value.ToString()) == Enum.Parse(EnumType, parameter.ToString()) ?
-                Visibility.Visible : Visibility.Collapsed;
-        }
-
-        public override object ConvertBack(Visibility value, object parameter, CultureInfo culture)
-        {
-            return value == Visibility.Visible ?
-                Enum.Parse(EnumType, parameter.ToString()) :
-                    throw new NotImplementedException();
+            return ConvertBase(value, parameter, culture) ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 
-    public class BoolToVisibilityConverter : ConverterBase<bool, Visibility>
+    public class BooleanToVisibilityConverter : ConverterBase<bool, Visibility>
     {
         public override Visibility Convert(bool value, object parameter, CultureInfo culture)
         {
-            return value ? Visibility.Visible : Visibility.Collapsed;
+            bool param = true;
+            if (parameter is bool boolParam ||
+                (parameter != null &&
+                bool.TryParse(parameter.ToString(), out boolParam)))
+            {
+                param = boolParam;
+            }
+            return value == param ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public override bool ConvertBack(Visibility value, object parameter, CultureInfo culture)
         {
-            return value == Visibility.Visible;
+            throw new NotImplementedException();
         }
     }
 
-    public class NegativeBoolToVisibilityConverter : ConverterBase<bool, Visibility>
+    public class MultiBooleanToVisibilityConverter : MultiValueConverterBase<bool, Visibility>
     {
-        public override Visibility Convert(bool value, object parameter, CultureInfo culture)
+        public override Visibility Convert(bool[] values, object parameter, CultureInfo culture)
         {
-            return !value ? Visibility.Visible : Visibility.Collapsed;
+            if (parameter is bool[] array)
+            {
+                if (array.Length == values.Length)
+                {
+                    return values.Select((v, i) => (v, i)).All(x => x.v == array[x.i]) ? Visibility.Visible : Visibility.Collapsed;
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+            }
+            else
+            {
+                return values.All(x => x) ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
-        public override bool ConvertBack(Visibility value, object parameter, CultureInfo culture)
+        public override bool[] ConvertBack(Visibility value, object parameter, CultureInfo culture)
         {
-            return value != Visibility.Visible;
+            throw new NotImplementedException();
         }
     }
 }

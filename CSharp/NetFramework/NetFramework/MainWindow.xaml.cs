@@ -15,6 +15,13 @@ using System.Windows.Shapes;
 
 namespace NetFramework
 {
+    public enum AAA
+    {
+        A1,
+        A2,
+        A3,
+    }
+
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
