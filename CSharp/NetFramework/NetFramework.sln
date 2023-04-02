@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVVM", "MVVM\MVVM.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCV", "OpenCV\OpenCV.csproj", "{DCEBDE1E-45CF-4124-B41E-4B5607B3E6DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Map3D", "Map3D\Map3D.csproj", "{DCD7A9DA-31E3-4F85-BA40-5339EEEBFFB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{DCEBDE1E-45CF-4124-B41E-4B5607B3E6DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCEBDE1E-45CF-4124-B41E-4B5607B3E6DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCEBDE1E-45CF-4124-B41E-4B5607B3E6DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCD7A9DA-31E3-4F85-BA40-5339EEEBFFB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCD7A9DA-31E3-4F85-BA40-5339EEEBFFB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCD7A9DA-31E3-4F85-BA40-5339EEEBFFB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCD7A9DA-31E3-4F85-BA40-5339EEEBFFB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
