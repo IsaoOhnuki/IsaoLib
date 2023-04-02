@@ -24,5 +24,18 @@ namespace Map3D
         {
             InitializeComponent();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //// Create the interop host control.
+            //System.Windows.Forms.Integration.WindowsFormsHost host =
+            //    new System.Windows.Forms.Integration.WindowsFormsHost();
+
+            //// Create the ActiveX control.
+            //D3DLib.D3DView d3DView = new D3DLib.D3DView();
+
+            //// Assign the ActiveX control as the host control's child.
+            //axHost.Child = (System.Windows.Forms.Control)d3DView;
+        }
     }
 }
