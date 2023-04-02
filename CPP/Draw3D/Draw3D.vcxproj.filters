@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ATL">
+      <UniqueIdentifier>{55f53aa4-2855-4411-8be0-fea0c1e2fde6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="View">
+      <UniqueIdentifier>{d64b2c7a-3a50-435c-86e9-101f435e16f8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Draw3D_i.h">
+      <Filter>ATL</Filter>
+    </ClInclude>
+    <ClInclude Include="dllmain.h">
+      <Filter>ATL</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>ATL</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>ATL</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>ATL</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>ATL</Filter>
+    </ClInclude>
+    <ClInclude Include="PreviewHandler.h">
+      <Filter>View</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawView.h">
+      <Filter>View</Filter>
+    </ClInclude>
+    <ClInclude Include="xdlldata.h">
+      <Filter>ATL</Filter>
+    </ClInclude>
+    <ClInclude Include="ThumbnailHandler.h">
+      <Filter>View</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Draw3D_i.c">
+      <Filter>ATL</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>ATL</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>ATL</Filter>
+    </ClCompile>
+    <ClCompile Include="xdlldata.c">
+      <Filter>ATL</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawView.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw3D.cpp">
+      <Filter>ATL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Draw3D.rgs">
+      <Filter>ATL</Filter>
+    </None>
+    <None Include="PreviewHandler.rgs">
+      <Filter>ATL</Filter>
+    </None>
+    <None Include="ThumbnailHandler.rgs">
+      <Filter>ATL</Filter>
+    </None>
+    <None Include="Draw3D.def">
+      <Filter>ATL</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Draw3D.rc">
+      <Filter>ATL</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Draw3D.idl">
+      <Filter>ATL</Filter>
+    </Midl>
+  </ItemGroup>
+</Project>

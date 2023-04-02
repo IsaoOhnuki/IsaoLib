@@ -1,0 +1,58 @@
+﻿// Draw3D.idl : Draw3D の IDL ソース
+//
+
+// このファイルは、タイプ ライブラリ ([!output SAFE_IDL_NAME].tlb) およびマーシャリング コードを
+// タイプ ライブラリ (Draw3D.tlb) とマーシャリング コードを生成します。
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+// 013059f3-606b-49de-8822-6c71cada6c4d
+// 0130b52e-9fb1-4609-8ddd-bc1ba91db5e5
+// 01302ea9-0202-47a7-b502-d8663301add0
+// 01309ba2-2b62-4206-aac7-2c418e93c987
+// 013026d8-f7e8-4815-949a-fced93f27b2b
+
+[
+	object,
+	uuid(0130caa6-089a-4ab5-9614-3d63af231ccd),
+	pointer_default(unique)
+]
+interface IPreview : IUnknown
+{
+};
+
+[
+	object,
+	uuid(01303c3d-639f-4020-bf52-c77013f6495a),
+	pointer_default(unique)
+]
+interface IThumbnail : IUnknown
+{
+};
+
+[
+	uuid(0130e987-df3c-4819-9525-810ccfc43d29),
+	version(1.0),
+]
+library Draw3DLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(01302af1-e6e4-43e8-b928-e7f5ad1c4669)
+	]
+	coclass Preview
+	{
+		[default] interface IPreviewHandler;
+	};
+	[
+		uuid(013013b2-2d1e-48fb-88c2-0a55d08f6aa2)
+	]
+	coclass Thumbnail
+	{
+		[default] interface IThumbnailProvider;
+	};
+};
+
+import "shobjidl.idl";
+import "thumbcache.idl";
