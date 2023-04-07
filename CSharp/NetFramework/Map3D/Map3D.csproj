@@ -100,7 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="D3DLib">
-      <Guid>{0130CD33-E214-48E8-9A4D-69EC62C35A1B}</Guid>
+      <Guid>{0130F01E-0698-45CC-8956-469758CE8AE7}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
